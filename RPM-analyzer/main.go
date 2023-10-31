@@ -3,8 +3,19 @@ package main
 import (
 	"fmt"
 	"os"
-	"path"
+	"os/exec"
+	"strings"
 )
+
+type node struct {
+	id           int
+	name         string
+	requirements []*node
+}
+
+func (p *node) AddRequirement(c *node) {
+	p.requirements = append((*p).requirements, c)
+}
 
 func main() {
 	args := os.Args[1:]
@@ -14,14 +25,12 @@ func main() {
 		return
 	}
 
-	rpmFilePath := args[0]
+	rpmPackageName := args[0]
 	outputDirPath := args[1]
 
-	rpmFileInfo, err := os.Stat(rpmFilePath)
-	if os.IsNotExist(err) || rpmFileInfo.IsDir() || path.Ext(rpmFilePath) != ".rpm" {
-		fmt.Println("incorrect path to RPM file")
-		return
-	}
+	fmt.Println(rpmPackageName, outputDirPath)
+
+	//TODO: check that rpm package is installed
 
 	outputDirInfo, err := os.Stat(outputDirPath)
 	if os.IsNotExist(err) || !outputDirInfo.IsDir() {
@@ -33,5 +42,55 @@ func main() {
 	//TODO: transform dependencies to machine-readable file for frontend
 	//TODO: put the file in outputDirPath
 
-	fmt.Println(args)
+	node := buildGraph(rpmPackageName)
+
+	fmt.Println(node)
+}
+
+func buildGraph(rpmPackageName string) node {
+	counter := 1
+	headNode := node{
+		id:           counter,
+		name:         rpmPackageName,
+		requirements: []*node{},
+	}
+
+	fmt.Println(headNode)
+	buildGraphRec(&headNode, 0, &map[string]int{}, &counter)
+
+	return headNode
+}
+
+func buildGraphRec(packageNode *node, depth int, seen *map[string]int, counter *int) {
+	var nodeName = packageNode.name
+	_, ok := (*seen)[nodeName]
+	if ok {
+		return
+	}
+	(*seen)[nodeName] = 1
+
+	cmd := exec.Command("rpm", "--query", "--requires", nodeName)
+	stdout, err := cmd.Output()
+	if err != nil {
+		return
+	}
+
+	stringRequirements := string(stdout)
+	fmt.Println(stringRequirements)
+	for _, element := range strings.Split(stringRequirements, "\n") {
+		if strings.Contains(element, "/") || element == "" {
+			continue
+		}
+
+		*counter++
+		requiredNode := &node{
+			id:           *counter,
+			name:         element,
+			requirements: []*node{},
+		}
+		fmt.Println(requiredNode)
+
+		packageNode.AddRequirement(requiredNode)
+		buildGraphRec(requiredNode, depth+1, seen, counter)
+	}
 }
