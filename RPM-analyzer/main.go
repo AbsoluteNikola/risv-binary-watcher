@@ -10,11 +10,22 @@ import (
 type node struct {
 	id           int
 	name         string
+	version      string
 	requirements []*node
 }
 
 func (p *node) AddRequirement(c *node) {
 	p.requirements = append((*p).requirements, c)
+}
+
+func createNode(id int, name string, version string) *node {
+	p := new(node)
+	p.id = id
+	p.name = name
+	p.version = version
+	p.requirements = []*node{}
+
+	return p
 }
 
 func main() {
@@ -44,19 +55,14 @@ func main() {
 
 	node := buildGraph(rpmPackageName)
 
-	fmt.Println(node)
+	printNode(node)
 }
 
-func buildGraph(rpmPackageName string) node {
+func buildGraph(rpmPackageName string) *node {
 	counter := 1
-	headNode := node{
-		id:           counter,
-		name:         rpmPackageName,
-		requirements: []*node{},
-	}
+	headNode := createNode(counter, rpmPackageName, "")
 
-	fmt.Println(headNode)
-	buildGraphRec(&headNode, 0, &map[string]int{}, &counter)
+	buildGraphRec(headNode, 0, &map[string]int{}, &counter)
 
 	return headNode
 }
@@ -75,22 +81,52 @@ func buildGraphRec(packageNode *node, depth int, seen *map[string]int, counter *
 		return
 	}
 
-	stringRequirements := string(stdout)
-	fmt.Println(stringRequirements)
-	for _, element := range strings.Split(stringRequirements, "\n") {
-		if strings.Contains(element, "/") || element == "" {
-			continue
-		}
-
+	rpmResponse := string(stdout)
+	requirements := getPackageRequirements(rpmResponse)
+	for _, element := range *requirements {
 		*counter++
-		requiredNode := &node{
-			id:           *counter,
-			name:         element,
-			requirements: []*node{},
-		}
-		fmt.Println(requiredNode)
+		name, version := getPackageNameAndVersion(element)
+		requiredNode := createNode(*counter, name, version)
 
 		packageNode.AddRequirement(requiredNode)
-		buildGraphRec(requiredNode, depth+1, seen, counter)
+		buildGraphRec(requiredNode, depth + 1, seen, counter)
+	}
+}
+
+func getPackageRequirements(rpmStdout string) *[]string {
+	requirements := strings.Split(rpmStdout, "\n")
+
+	var filtered []string
+	for _, element := range requirements {
+		if !strings.Contains(element, "/") &&
+			!strings.Contains(element, "(") &&
+			element != "" {
+			filtered = append(filtered, element)
+		}
+	}
+
+	return &filtered
+}
+
+func getPackageNameAndVersion(requirement string) (string, string) {
+	requirementParts := strings.SplitN(requirement, " ", 2)
+
+	if len(requirementParts) == 1 {
+		return requirement, ""
+	}
+
+	return requirementParts[0], requirementParts[1]
+}
+
+func printNode(head *node) {
+	fmt.Printf("Id: %d, Name: %s, Version: %s", head.id, head.name, head.version)
+	fmt.Printf(" Req: ")
+	for _, req := range head.requirements {
+		fmt.Printf("%d ", req.id)
+	}
+	fmt.Println()
+
+	for _, child := range head.requirements {
+		printNode(child)
 	}
 }
