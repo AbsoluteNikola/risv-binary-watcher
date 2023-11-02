@@ -1,0 +1,59 @@
+{
+  "type": "object",
+  "required": [
+    "version",
+    "nodes"
+  ],
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Integer identifier of node",
+            "type": "integer"
+          },
+          "name": {
+            "description": "Name of node",
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "description": "Array of tags relevant to this node. Web, Compilers and so on",
+            "items": {
+              "type": "string"
+            }
+          },
+          "dependsOn": {
+            "type": "array",
+            "description": "Array of IDs of other nodes, on what current node depends",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "label": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "tags",
+          "dependsOn"
+        ]
+      }
+    }
+  }
+}
