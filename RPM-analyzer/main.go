@@ -11,6 +11,8 @@ type node struct {
 	id           int
 	name         string
 	version      string
+	size         string
+	installDate  string
 	requirements []*node
 }
 
@@ -18,11 +20,13 @@ func (p *node) AddRequirement(c *node) {
 	p.requirements = append((*p).requirements, c)
 }
 
-func createNode(id int, name string, version string) *node {
+func createNode(id int, name string, version string, size string, installDate string) *node {
 	p := new(node)
 	p.id = id
 	p.name = name
 	p.version = version
+	p.size = size
+	p.installDate = installDate
 	p.requirements = []*node{}
 
 	return p
@@ -39,86 +43,130 @@ func main() {
 	rpmPackageName := args[0]
 	outputDirPath := args[1]
 
-	fmt.Println(rpmPackageName, outputDirPath)
-
-	//TODO: check that rpm package is installed
+	fmt.Println("Arguments: ", rpmPackageName, outputDirPath)
 
 	outputDirInfo, err := os.Stat(outputDirPath)
 	if os.IsNotExist(err) || !outputDirInfo.IsDir() {
 		fmt.Println("incorrect path to directory for output file")
 		return
 	}
-
-	//TODO: call "rpm -qpR {rpmFilePath}" and get dependencies
-	//TODO: transform dependencies to machine-readable file for frontend
-	//TODO: put the file in outputDirPath
-
 	node := buildGraph(rpmPackageName)
 
-	printNode(node)
+	if node != nil {
+		printNode(node)
+	}
 }
 
 func buildGraph(rpmPackageName string) *node {
-	counter := 1
-	headNode := createNode(counter, rpmPackageName, "")
+	counter := 0
+	seen := map[string]*node{}
+	depth := 0
 
-	buildGraphRec(headNode, 0, &map[string]int{}, &counter)
-
-	return headNode
+	return buildGraphRec(rpmPackageName, depth, &seen, &counter)
 }
 
-func buildGraphRec(packageNode *node, depth int, seen *map[string]int, counter *int) {
-	var nodeName = packageNode.name
-	_, ok := (*seen)[nodeName]
+func buildGraphRec(packageName string, depth int, seen *map[string]*node, counter *int) *node {
+	if depth > 5 {
+		return nil
+	}
+
+	processedNode, ok := (*seen)[packageName]
 	if ok {
-		return
-	}
-	(*seen)[nodeName] = 1
-
-	cmd := exec.Command("rpm", "--query", "--requires", nodeName)
-	stdout, err := cmd.Output()
-	if err != nil {
-		return
+		return processedNode
 	}
 
-	rpmResponse := string(stdout)
-	requirements := getPackageRequirements(rpmResponse)
+	node, requirements := getNodeFromRpm(packageName, counter)
+	if node == nil || requirements == nil {
+		return node
+	}
+
+	(*seen)[packageName] = node
+
 	for _, element := range *requirements {
-		*counter++
-		name, version := getPackageNameAndVersion(element)
-		requiredNode := createNode(*counter, name, version)
+		child := buildGraphRec(element, depth+1, seen, counter)
 
-		packageNode.AddRequirement(requiredNode)
-		buildGraphRec(requiredNode, depth + 1, seen, counter)
-	}
-}
-
-func getPackageRequirements(rpmStdout string) *[]string {
-	requirements := strings.Split(rpmStdout, "\n")
-
-	var filtered []string
-	for _, element := range requirements {
-		if !strings.Contains(element, "/") &&
-			!strings.Contains(element, "(") &&
-			element != "" {
-			filtered = append(filtered, element)
+		if child != nil {
+			node.AddRequirement(child)
 		}
 	}
 
-	return &filtered
+	return node
 }
 
-func getPackageNameAndVersion(requirement string) (string, string) {
-	requirementParts := strings.SplitN(requirement, " ", 2)
+func getNodeFromRpm(packageName string, counter *int) (*node, *[]string) {
+	rpmResponse := runRpm(packageName)
 
-	if len(requirementParts) == 1 {
-		return requirement, ""
+	if rpmResponse == "" {
+		return getLeafNode(counter, packageName), &[]string{}
 	}
 
-	return requirementParts[0], requirementParts[1]
+	requirements := strings.Split(rpmResponse, "\n")
+
+	packageInfo := requirements[0]
+	node := getNodeFromRpmInfo(counter, packageInfo)
+
+	var filtered []string
+	for _, element := range requirements[1:] {
+		if !strings.Contains(element, "/") &&
+			!strings.Contains(element, "(") &&
+			element != "" {
+			elementParts := strings.SplitN(element, " ", 2)
+
+			filtered = append(filtered, elementParts[0])
+		}
+	}
+
+	return node, &filtered
+}
+
+func runRpm(packageName string) string {
+	cmd := exec.Command(
+		"rpm",
+		"--query",
+		"--queryformat",
+		"[%{name} %{version} %{size} %{installtime:date}\n]",
+		"--requires",
+		packageName)
+	stdout, err := cmd.Output()
+	if err != nil {
+		return ""
+	}
+
+	return string(stdout)
+}
+
+func getLeafNode(counter *int, packageName string) *node {
+	*counter++
+	return createNode(*counter, packageName, "", "", "")
+}
+
+func getNodeFromRpmInfo(counter *int, requirement string) *node {
+	if requirement == "" {
+		return nil
+	}
+
+	requirementParts := strings.SplitN(requirement, " ", 4)
+
+	*counter++
+	return createNode(
+		*counter,
+		requirementParts[0],
+		requirementParts[1],
+		requirementParts[2],
+		requirementParts[3])
 }
 
 func printNode(head *node) {
+	printNodeRec(head, &map[string]int{})
+}
+
+func printNodeRec(head *node, seen *map[string]int) {
+	_, ok := (*seen)[head.name]
+	if ok {
+		return
+	}
+	(*seen)[head.name] = 1
+
 	fmt.Printf("Id: %d, Name: %s, Version: %s", head.id, head.name, head.version)
 	fmt.Printf(" Req: ")
 	for _, req := range head.requirements {
@@ -127,6 +175,6 @@ func printNode(head *node) {
 	fmt.Println()
 
 	for _, child := range head.requirements {
-		printNode(child)
+		printNodeRec(child, seen)
 	}
 }
