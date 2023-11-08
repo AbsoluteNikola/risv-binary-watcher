@@ -157,24 +157,5 @@ func getNodeFromRpmInfo(counter *int, requirement string) *node {
 }
 
 func printNode(head *node) {
-	printNodeRec(head, &map[string]int{})
-}
-
-func printNodeRec(head *node, seen *map[string]int) {
-	_, ok := (*seen)[head.name]
-	if ok {
-		return
-	}
-	(*seen)[head.name] = 1
-
-	fmt.Printf("Id: %d, Name: %s, Version: %s", head.id, head.name, head.version)
-	fmt.Printf(" Req: ")
-	for _, req := range head.requirements {
-		fmt.Printf("%d ", req.id)
-	}
-	fmt.Println()
-
-	for _, child := range head.requirements {
-		printNodeRec(child, seen)
-	}
+	fmt.Println(serializeNodeToJson(head))
 }
