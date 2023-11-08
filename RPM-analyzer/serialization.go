@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-type nodeModel struct {
+type nodePresentation struct {
 	Id           int
 	Name         string
 	Version      string
@@ -14,14 +14,14 @@ type nodeModel struct {
 	Requirements []int
 }
 
-func mapTreeToNodeModelArray(node *node, visited map[*node]bool) []nodeModel {
+func mapTreeToNodeModelArray(node *node, visited map[*node]bool) []nodePresentation {
 	if visited[node] {
-		return []nodeModel{}
+		return []nodePresentation{}
 	}
 
 	visited[node] = true
 
-	var result = make([]nodeModel, 0)
+	var result = make([]nodePresentation, 0)
 	result = append(result, mapNodeToNodeModel(node))
 
 	for _, requirement := range node.requirements {
@@ -31,7 +31,7 @@ func mapTreeToNodeModelArray(node *node, visited map[*node]bool) []nodeModel {
 	return result
 }
 
-func mapNodeToNodeModel(node *node) nodeModel {
+func mapNodeToNodeModel(node *node) nodePresentation {
 	var child = node.requirements
 	var childIds = make([]int, 0)
 
@@ -39,7 +39,7 @@ func mapNodeToNodeModel(node *node) nodeModel {
 		childIds = append(childIds, children.id)
 	}
 
-	var model = nodeModel{
+	var model = nodePresentation{
 		Id:           node.id,
 		Name:         node.name,
 		Version:      node.version,
