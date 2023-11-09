@@ -2,7 +2,7 @@ name: RiscV watcher CI
 run-name: ${{ github.actor }} is testing out GitHub Actions
 on: [push]
 jobs:
-  frontend ci:
+  frontend_ci:
     runs-on: ubuntu-latest
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
@@ -16,7 +16,7 @@ jobs:
         run: |
           ls ${{ github.workspace }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
-  backend ci:
+  backend_ci:
     runs-on: ubuntu-latest
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
