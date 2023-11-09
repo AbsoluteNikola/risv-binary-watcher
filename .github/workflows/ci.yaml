@@ -1,0 +1,36 @@
+name: RiscV watcher CI
+run-name: ${{ github.actor }} is testing out GitHub Actions
+on: [push]
+jobs:
+  frontend_ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+      - run: npm ci
+        working-directory: ./frontend
+      - run: npm run build --if-present
+        working-directory: ./frontend
+      - run: npm test
+        working-directory: ./frontend
+
+  rpm_analyzer_ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21.4'
+      - name: Install dependencies
+        run: go get .
+        working-directory: ./RPM-analyzer
+      - name: Build
+        run: go build -v ./...
+        working-directory: ./RPM-analyzer
+      - name: Test with the Go CLI
+        working-directory: ./RPM-analyzer
+        run: go test
