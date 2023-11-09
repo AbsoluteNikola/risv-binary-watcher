@@ -19,16 +19,18 @@ jobs:
 
   rpm_analyzer_ci:
     runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v4
-        - name: Setup Go
-          uses: actions/setup-go@v4
-          with:
-            go-version: '1.21.x'
-        - name: Install dependencies
-          run: go get .
-           working-directory: ./RPM-analyzer
-        - name: Build
-          run: go build -v ./...
-        - name: Test with the Go CLI
-          run: go test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21.4'
+      - name: Install dependencies
+        run: go get .
+        working-directory: ./RPM-analyzer
+      - name: Build
+        run: go build -v ./...
+        working-directory: ./RPM-analyzer
+      - name: Test with the Go CLI
+        working-directory: ./RPM-analyzer
+        run: go test
