@@ -257,7 +257,7 @@ function App() {
                     const incomerIds = allIncomers.map((i) => i.id)
                     const outgoerIds = allOutgoers.map((o) => o.id)
 
-                    if (isNode(elem) && (allOutgoers.length > 0 || allIncomers.length > 0)) {
+                    if (allOutgoers.length > 0 || allIncomers.length > 0) {
                         const highlight = elem.id === node.id || incomerIds.includes(elem.id) || outgoerIds.includes(elem.id)
 
                         elem.style = {
@@ -273,33 +273,32 @@ function App() {
                 return prevElements?.map((elem) => {
                     const incomerIds = allIncomers.map((i) => i.id)
                     const outgoerIds = allOutgoers.map((o) => o.id)
-                    if (isEdge(elem)) {
-                        if (selection) {
-                            const animated_output =
-                                outgoerIds.includes(elem.target) && node.id === elem.source
-                            const animated_inp =
-                                incomerIds.includes(elem.source) && node.id === elem.target
+                    if (selection) {
+                        const animated_output =
+                            outgoerIds.includes(elem.target) && node.id === elem.source
+                        const animated_inp =
+                            incomerIds.includes(elem.source) && node.id === elem.target
 
-                            const animated = animated_inp || animated_output
-                            elem.animated = animated
-                            let color = '#FF0000'
-                            if (animated_inp) color = '#008000'
-                            elem.style = {
-                                ...elem.style,
-                                stroke: animated ? color : '#b1b1b7',
-                                strokeWidth: animated ? 2: 1,
-                                opacity: animated ? 1 : 0.25,
-                            }
-                        } else {
-                            elem.animated = false
-                            elem.style = {
-                                ...elem.style,
-                                stroke: '#b1b1b7',
-                                opacity: 1,
-                                strokeWidth: 1,
-                            }
+                        const animated = animated_inp || animated_output
+                        elem.animated = animated
+                        let color = '#FF0000'
+                        if (animated_inp) color = '#008000'
+                        elem.style = {
+                            ...elem.style,
+                            stroke: animated ? color : '#b1b1b7',
+                            strokeWidth: animated ? 2 : 1,
+                            opacity: animated ? 1 : 0.25,
+                        }
+                    } else {
+                        elem.animated = false
+                        elem.style = {
+                            ...elem.style,
+                            stroke: '#b1b1b7',
+                            opacity: 1,
+                            strokeWidth: 1,
                         }
                     }
+
 
                     return elem
                 })
@@ -314,27 +313,22 @@ function App() {
     const resetNodeStyles = () => {
         setNodes((prevElements) => {
             return prevElements?.map((elem) => {
-                if (isNode(elem)) {
-                    elem.style = {
-                        ...elem.style,
-                        opacity: 1,
-                    }
+                elem.style = {
+                    ...elem.style,
+                    opacity: 1,
                 }
                 return elem
             })
         });
         setEdges((prevElements) => {
             return prevElements?.map((elem) => {
-                if (isEdge((elem))) {
-                    elem.animated = false
-                    elem.style = {
-                        ...elem.style,
-                        stroke: '#b1b1b7',
-                        strokeWidth: 1,
-                        opacity: 1,
-                    }
+                elem.animated = false
+                elem.style = {
+                    ...elem.style,
+                    stroke: '#b1b1b7',
+                    strokeWidth: 1,
+                    opacity: 1,
                 }
-
                 return elem
             })
         })
