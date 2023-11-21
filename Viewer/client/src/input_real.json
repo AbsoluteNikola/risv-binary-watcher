@@ -1,0 +1,317 @@
+[
+  {
+    "Id": 1,
+    "Name": "redhat-rpm-config",
+    "Version": "202",
+    "Size": "174297",
+    "InstallDate": "Tue 31 Oct 2023 05:04:37 PM UTC",
+    "Requirements": [
+      2,
+      3,
+      5,
+      13,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      14,
+      29,
+      30,
+      31
+    ]
+  },
+  {
+    "Id": 2,
+    "Name": "ansible-srpm-macros",
+    "Version": "1",
+    "Size": "1251",
+    "InstallDate": "Tue 31 Oct 2023 05:04:34 PM UTC",
+    "Requirements": []
+  },
+  {
+    "Id": 3,
+    "Name": "coreutils",
+    "Version": "8.32",
+    "Size": "6033722",
+    "InstallDate": "Thu 12 Oct 2023 08:34:17 PM UTC",
+    "Requirements": [
+      4
+    ]
+  },
+  {
+    "Id": 4,
+    "Name": "coreutils-common",
+    "Version": "8.32",
+    "Size": "10880304",
+    "InstallDate": "Thu 12 Oct 2023 08:34:17 PM UTC",
+    "Requirements": []
+  },
+  {
+    "Id": 5,
+    "Name": "dwz",
+    "Version": "0.14",
+    "Size": "280646",
+    "InstallDate": "Tue 31 Oct 2023 05:04:37 PM UTC",
+    "Requirements": [
+      6
+    ]
+  },
+  {
+    "Id": 6,
+    "Name": "glibc",
+    "Version": "2.34",
+    "Size": "6222211",
+    "InstallDate": "Thu 12 Oct 2023 08:34:09 PM UTC",
+    "Requirements": [
+      7,
+      7,
+      10,
+      12
+    ]
+  },
+  {
+    "Id": 7,
+    "Name": "basesystem",
+    "Version": "11",
+    "Size": "0",
+    "InstallDate": "Wed 12 Jan 2022 09:26:33 AM UTC",
+    "Requirements": [
+      8,
+      9
+    ]
+  },
+  {
+    "Id": 8,
+    "Name": "filesystem",
+    "Version": "3.14",
+    "Size": "106",
+    "InstallDate": "Wed 12 Jan 2022 09:26:33 AM UTC",
+    "Requirements": [
+      9
+    ]
+  },
+  {
+    "Id": 9,
+    "Name": "setup",
+    "Version": "2.14.1",
+    "Size": "735847",
+    "InstallDate": "Thu 12 Oct 2023 08:34:15 PM UTC",
+    "Requirements": []
+  },
+  {
+    "Id": 10,
+    "Name": "glibc-common",
+    "Version": "2.34",
+    "Size": "1090073",
+    "InstallDate": "Thu 12 Oct 2023 08:34:10 PM UTC",
+    "Requirements": [
+      6,
+      11
+    ]
+  },
+  {
+    "Id": 11,
+    "Name": "tzdata",
+    "Version": "2022g",
+    "Size": "1693900",
+    "InstallDate": "Thu 12 Oct 2023 08:34:06 PM UTC",
+    "Requirements": []
+  },
+  {
+    "Id": 12,
+    "Name": "glibc-langpack",
+    "Version": "",
+    "Size": "",
+    "InstallDate": "",
+    "Requirements": []
+  },
+  {
+    "Id": 13,
+    "Name": "efi-srpm-macros",
+    "Version": "5",
+    "Size": "41111",
+    "InstallDate": "Tue 31 Oct 2023 05:04:37 PM UTC",
+    "Requirements": [
+      14
+    ]
+  },
+  {
+    "Id": 14,
+    "Name": "rpm",
+    "Version": "4.17.1",
+    "Size": "2943525",
+    "InstallDate": "Thu 12 Oct 2023 08:34:49 PM UTC",
+    "Requirements": [
+      3,
+      15
+    ]
+  },
+  {
+    "Id": 15,
+    "Name": "curl",
+    "Version": "7.79.1",
+    "Size": "723092",
+    "InstallDate": "Thu 12 Oct 2023 08:34:24 PM UTC",
+    "Requirements": []
+  },
+  {
+    "Id": 16,
+    "Name": "fonts-srpm-macros",
+    "Version": "2.0.5",
+    "Size": "56503",
+    "InstallDate": "Tue 31 Oct 2023 05:04:37 PM UTC",
+    "Requirements": [
+      1
+    ]
+  },
+  {
+    "Id": 17,
+    "Name": "fpc-srpm-macros",
+    "Version": "1.3",
+    "Size": "144",
+    "InstallDate": "Tue 31 Oct 2023 05:04:36 PM UTC",
+    "Requirements": []
+  },
+  {
+    "Id": 18,
+    "Name": "ghc-srpm-macros",
+    "Version": "1.5.0",
+    "Size": "535",
+    "InstallDate": "Tue 31 Oct 2023 05:04:35 PM UTC",
+    "Requirements": []
+  },
+  {
+    "Id": 19,
+    "Name": "gnat-srpm-macros",
+    "Version": "4",
+    "Size": "725",
+    "InstallDate": "Tue 31 Oct 2023 05:04:35 PM UTC",
+    "Requirements": []
+  },
+  {
+    "Id": 20,
+    "Name": "go-srpm-macros",
+    "Version": "3.2.0",
+    "Size": "60838",
+    "InstallDate": "Tue 31 Oct 2023 05:04:37 PM UTC",
+    "Requirements": [
+      1
+    ]
+  },
+  {
+    "Id": 21,
+    "Name": "kernel-srpm-macros",
+    "Version": "1.0",
+    "Size": "621",
+    "InstallDate": "Tue 31 Oct 2023 05:04:35 PM UTC",
+    "Requirements": []
+  },
+  {
+    "Id": 22,
+    "Name": "lua-srpm-macros",
+    "Version": "1",
+    "Size": "1314",
+    "InstallDate": "Tue 31 Oct 2023 05:04:35 PM UTC",
+    "Requirements": [
+      14
+    ]
+  },
+  {
+    "Id": 23,
+    "Name": "nim-srpm-macros",
+    "Version": "3",
+    "Size": "1098",
+    "InstallDate": "Tue 31 Oct 2023 05:04:35 PM UTC",
+    "Requirements": []
+  },
+  {
+    "Id": 24,
+    "Name": "ocaml-srpm-macros",
+    "Version": "6",
+    "Size": "745",
+    "InstallDate": "Tue 31 Oct 2023 05:04:35 PM UTC",
+    "Requirements": []
+  },
+  {
+    "Id": 25,
+    "Name": "openblas-srpm-macros",
+    "Version": "2",
+    "Size": "104",
+    "InstallDate": "Tue 31 Oct 2023 05:04:35 PM UTC",
+    "Requirements": []
+  },
+  {
+    "Id": 26,
+    "Name": "perl-srpm-macros",
+    "Version": "1",
+    "Size": "862",
+    "InstallDate": "Tue 31 Oct 2023 05:04:35 PM UTC",
+    "Requirements": []
+  },
+  {
+    "Id": 27,
+    "Name": "python-srpm-macros",
+    "Version": "3.10",
+    "Size": "42939",
+    "InstallDate": "Tue 31 Oct 2023 05:04:37 PM UTC",
+    "Requirements": [
+      1
+    ]
+  },
+  {
+    "Id": 28,
+    "Name": "qt5-srpm-macros",
+    "Version": "5.15.2",
+    "Size": "492",
+    "InstallDate": "Tue 31 Oct 2023 05:04:35 PM UTC",
+    "Requirements": []
+  },
+  {
+    "Id": 29,
+    "Name": "rpmautospec-rpm-macros",
+    "Version": "0.3.0",
+    "Size": "707",
+    "InstallDate": "Tue 31 Oct 2023 05:04:29 PM UTC",
+    "Requirements": [
+      14
+    ]
+  },
+  {
+    "Id": 30,
+    "Name": "rust-srpm-macros",
+    "Version": "23",
+    "Size": "2447",
+    "InstallDate": "Tue 31 Oct 2023 05:04:29 PM UTC",
+    "Requirements": []
+  },
+  {
+    "Id": 31,
+    "Name": "zip",
+    "Version": "3.0",
+    "Size": "712847",
+    "InstallDate": "Tue 31 Oct 2023 05:04:35 PM UTC",
+    "Requirements": [
+      6,
+      32
+    ]
+  },
+  {
+    "Id": 32,
+    "Name": "unzip",
+    "Version": "6.0",
+    "Size": "394499",
+    "InstallDate": "Tue 31 Oct 2023 05:04:35 PM UTC",
+    "Requirements": [
+      6
+    ]
+  }
+]

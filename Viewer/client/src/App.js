@@ -114,15 +114,15 @@ function App() {
 
     function myFunction(raw_node) {
         setNodes((nds) => nds.concat({
-            id: raw_node.id.toString(),
+            id: raw_node.Id.toString(),
             position: def_position,
-            data: {label: raw_node.name + '\nversion ' + raw_node.version},
-            size: parseInt(raw_node.size)
+            data: {label: raw_node.Name + '\nversion ' + raw_node.Version},
+            size: parseInt(raw_node.Size)
         }));
-        raw_node.requirements.forEach((e) =>
+        raw_node.Requirements.forEach((e) =>
             setEdges((edgs) => edgs.concat({
-                id: 'e' + raw_node.id.toString() + e.toString(),
-                source: raw_node.id.toString(),
+                id: 'e' + raw_node.Id.toString() + e.toString(),
+                source: raw_node.Id.toString(),
                 target: e.toString(),
                 type: 'smoothstep',
                 markerEnd: {
