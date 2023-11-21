@@ -109,6 +109,8 @@ function App() {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
+    const def_position = {x: 0, y: 0};
+
     const onChangeFile = async (e) => {
         const files = (e.target).files;
 
@@ -116,8 +118,16 @@ function App() {
             let file = files[0];
             if (file == null) return;
             console.log(file.text());
-            //let jsonData = JSON.parse(await file.text())
-            setNodes((nds) => nds.concat({id: '3333', position: {x: 0, y: 0}, data: {label: '1000'}}));
+            let jsonData = JSON.parse(await file.text())
+            setNodes([]);
+            setEdges([]);
+
+            jsonData.forEach((raw_node) => setNodes((nds) => nds.concat({
+                id: raw_node.id.toString(),
+                position: def_position,
+                data: {label: raw_node.name + '\nversion ' + raw_node.version}
+            })))
+            // setNodes((nds) => nds.concat({id: '3333', position: {x: 0, y: 0}, data: {label: '1000'}}));
             const forceLayout = document.getElementById("testLayoutClick");
             await sleep(10);
             forceLayout.click()
