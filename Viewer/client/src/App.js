@@ -11,14 +11,15 @@ import ReactFlow, {
 } from 'reactflow';
 import './App.css';
 import 'reactflow/dist/style.css';
+import {MarkerType} from "reactflow";
 
 const elk = new ELK();
 
 
 const elkOptions = {
-    'elk.algorithm': 'layered',
+    'elk.algorithm': 'force',
     'elk.layered.spacing.nodeNodeBetweenLayers': '100',
-    'elk.spacing.nodeNode': '80',
+    'elk.spacing.nodeNode': '100'
 };
 
 const getLayoutedElements = (nodes, edges, options = {}) => {
@@ -111,6 +112,28 @@ function App() {
 
     const def_position = {x: 0, y: 0};
 
+    function myFunction(raw_node) {
+        setNodes((nds) => nds.concat({
+            id: raw_node.id.toString(),
+            position: def_position,
+            data: {label: raw_node.name + '\nversion ' + raw_node.version},
+            size: parseInt(raw_node.size)
+        }));
+        raw_node.requirements.forEach((e) =>
+            setEdges((edgs) => edgs.concat({
+                id: 'e' + raw_node.id.toString() + e.toString(),
+                source: raw_node.id.toString(),
+                target: e.toString(),
+                type: 'smoothstep',
+                markerEnd: {
+                    type: MarkerType.ArrowClosed,
+                    width: 20,
+                    height: 20,
+                    color: '#000000',
+                }
+            })))
+    }
+
     const onChangeFile = async (e) => {
         const files = (e.target).files;
 
@@ -119,14 +142,10 @@ function App() {
             if (file == null) return;
             console.log(file.text());
             let jsonData = JSON.parse(await file.text())
-            setNodes([]);
             setEdges([]);
+            setNodes([]);
 
-            jsonData.forEach((raw_node) => setNodes((nds) => nds.concat({
-                id: raw_node.id.toString(),
-                position: def_position,
-                data: {label: raw_node.name + '\nversion ' + raw_node.version}
-            })))
+            jsonData.forEach(myFunction)
             // setNodes((nds) => nds.concat({id: '3333', position: {x: 0, y: 0}, data: {label: '1000'}}));
             const forceLayout = document.getElementById("testLayoutClick");
             await sleep(10);

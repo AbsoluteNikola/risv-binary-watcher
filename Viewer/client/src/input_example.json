@@ -3,7 +3,7 @@
     "id": 1,
     "name": "1",
     "version": "1.0.0",
-    "size": 1024,
+    "size": "1024",
     "installDate": "10.11.21",
     "requirements": [
       2,
@@ -14,7 +14,7 @@
     "id": 2,
     "name": "2",
     "version": "1.2.3",
-    "size": 512,
+    "size": "512",
     "installDate": "10.12.23",
     "requirements": [
       1,
@@ -25,7 +25,7 @@
     "id": 3,
     "name": "3",
     "version": "1.2.3",
-    "size": 12,
+    "size": "12",
     "installDate": "01.12.23",
     "requirements": [
       4
@@ -35,7 +35,7 @@
     "id": 4,
     "name": "4",
     "version": "1.2.3",
-    "size": 5000,
+    "size": "5000",
     "installDate": "19.12.23",
     "requirements": [
     ]
