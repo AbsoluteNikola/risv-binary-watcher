@@ -177,10 +177,11 @@ function App() {
             jsonData.forEach(newGraphFromJS)
             const forceLayout = document.getElementById("vert");
             await sleep(10);
-            forceLayout.click()
+            forceLayout.click();
+            await sleep(10);
+            setTimeout(fitView, 10);
         }
     };
-
 
     return (
         <Grid w="100vw" h="100vh" templateColumns="repeat(6, 1fr)" gap={0}>
@@ -199,6 +200,7 @@ function App() {
                 {SliderMarkExample(useState)}
                 <Heading as='h5' size='sm' mt={10}>by requirements count:</Heading>
                 {SliderMarkExample(useState)}
+                <Button id='fitview_button' variant='solid' width='100%' onClick={fitView}>Reset</Button>
             </GridItem>
 
             <GridItem colSpan={5}>
