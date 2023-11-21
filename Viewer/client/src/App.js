@@ -14,9 +14,29 @@ import ReactFlow, {
     isEdge,
     isNode
 } from 'reactflow';
+import {
+    Button,
+    Heading,
+    FormControl,
+    FormLabel,
+    Grid,
+    GridItem,
+    Text,
+    Input,
+    Select,
+    Stack,
+    ChakraProvider,
+    Slider,
+    SliderTrack,
+    SliderFilledTrack,
+    SliderThumb,
+    SliderMark,
+    Tooltip
+} from "@chakra-ui/react";
 import './App.css';
 import 'reactflow/dist/style.css';
 import {highlightPath, resetNodeStyles} from "./highlight";
+import {SliderMarkExample} from "./slider";
 
 const elk = new ELK();
 
@@ -55,8 +75,6 @@ const getLayoutedElements = (nodes, edges, options = {}) => {
         .then((layoutedGraph) => ({
             nodes: layoutedGraph.children.map((node) => ({
                 ...node,
-                // React Flow expects a position property on the node instead of `x`
-                // and `y` fields.
                 position: {x: node.x, y: node.y},
             })),
 
@@ -123,7 +141,7 @@ function App() {
 
     const def_position = {x: 0, y: 0};
 
-    function myFunction(raw_node) {
+    function newGraphFromJS(raw_node) {
         setNodes((nds) => nds.concat({
             id: raw_node.Id.toString(),
             position: def_position,
@@ -156,56 +174,68 @@ function App() {
             setEdges([]);
             setNodes([]);
 
-            jsonData.forEach(myFunction)
-            // setNodes((nds) => nds.concat({id: '3333', position: {x: 0, y: 0}, data: {label: '1000'}}));
-            const forceLayout = document.getElementById("testLayoutClick");
+            jsonData.forEach(newGraphFromJS)
+            const forceLayout = document.getElementById("vert");
             await sleep(10);
             forceLayout.click()
         }
     };
 
 
-
     return (
-        <div style={{width: '100vw', height: '100vh'}}>
-            <div>
-                <input type="file" onChange={(e) => onChangeFile(e)}/>
-            </div>
-            <ReactFlow
-                nodes={nodes}
-                edges={edges}
-                //onConnect={onConnect}
-                onNodesChange={onNodesChange}
-                onEdgesChange={onEdgesChange}
-                fitView
-                elementsSelectable={true}
-                // onNodeMouseEnter={(_event, node) => !selectedNode && highlightPath(node, [...nodes, ...edges])}
-                // onNodeMouseLeave={() => !selectedNode && resetNodeStyles()}
-                onSelectionChange={(selectedElements) => {
-                    const node = selectedElements.nodes[0]
-                    if (node == null) {
-                        resetNodeStyles(setNodes, setEdges)
-                        setSelectedNode(undefined)
-                    } else {
-                        setSelectedNode(node)
-                        highlightPath(node, nodes, edges, true, setNodes, setEdges)
-                    }
-                }}
-            >
-                <Panel position="top-right">
-                    <button id="testLayoutClick" onClick={() => onLayout({direction: 'DOWN'})}>vertical layout</button>
+        <Grid w="100vw" h="100vh" templateColumns="repeat(6, 1fr)" gap={0}>
+            <GridItem p={4} borderRight="1px solid" borderColor="gray.200">
+                {/*<div style={{width: '100vw', height: '100vh'}}>*/}
+                <label>
+                    <input type="file" style={{display: 'none'}} onChange={(e) => onChangeFile(e)}/>
+                    <Button as="span" variant='solid' width='100%'>Upload File</Button>
+                </label>
+                <Heading as='h4' size='md' mt={4}>Layout style:</Heading>
+                <Button id="vert" onClick={() => onLayout({direction: 'DOWN'})} width='45%' mt={4}>VERTICAL</Button>
+                <Button id="hor" style={{float: 'right'}} onClick={() => onLayout({direction: 'RIGHT'})} width='45%'
+                        mt={4}>HORIZONTAL</Button>
+                <Heading as='h4' size='md' mt={4}>Filters:</Heading>
+                <Heading as='h5' size='sm' mt={4}>by size:</Heading>
+                {SliderMarkExample(useState)}
+                <Heading as='h5' size='sm' mt={10}>by requirements count:</Heading>
+                {SliderMarkExample(useState)}
+            </GridItem>
 
-                    <button onClick={() => onLayout({direction: 'RIGHT'})}>horizontal layout</button>
-                </Panel>
-            </ReactFlow>
-        </div>
-    );
+            <GridItem colSpan={5}>
+
+                <ReactFlow
+                    nodes={nodes}
+                    edges={edges}
+                    //onConnect={onConnect}
+                    onNodesChange={onNodesChange}
+                    onEdgesChange={onEdgesChange}
+                    fitView
+                    elementsSelectable={true}
+                    onSelectionChange={(selectedElements) => {
+                        const node = selectedElements.nodes[0]
+                        if (node == null) {
+                            resetNodeStyles(setNodes, setEdges)
+                            setSelectedNode(undefined)
+                        } else {
+                            setSelectedNode(node)
+                            highlightPath(node, nodes, edges, true, setNodes, setEdges)
+                        }
+                    }}
+                >
+                </ReactFlow>
+                {/*</div>*/}
+            </GridItem>
+        </Grid>
+    )
+        ;
 }
 
 export default () => (
-    <ReactFlowProvider>
-        <App/>
-    </ReactFlowProvider>
+    <ChakraProvider>
+        <ReactFlowProvider>
+            <App/>
+        </ReactFlowProvider>
+    </ChakraProvider>
 );
 
 
