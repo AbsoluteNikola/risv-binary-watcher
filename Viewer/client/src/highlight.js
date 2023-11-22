@@ -95,10 +95,12 @@ function setElements(node, nodes, edges, selection, setNodes, setEdges) {
 
                 if (allOutgoers.length > 0 || allIncomers.length > 0) {
                     const highlight = elem.id === node.id || incomerIds.includes(elem.id) || outgoerIds.includes(elem.id)
+                    const main_node = elem.id === node.id
 
                     elem.style = {
                         ...elem.style,
                         opacity: highlight ? 1 : 0.25,
+                        background: main_node ? '#E2E8F0' : 'white',
                     }
                 }
                 return elem
@@ -152,6 +154,7 @@ export const resetNodeStyles = (setNodes, setEdges) => {
             elem.style = {
                 ...elem.style,
                 opacity: 1,
+                background: 'white'
             }
             return elem
         })
