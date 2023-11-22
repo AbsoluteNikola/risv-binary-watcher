@@ -12,7 +12,8 @@ import ReactFlow, {
     getOutgoers,
     getIncomers,
     isEdge,
-    isNode
+    isNode,
+    useStoreApi
 } from 'reactflow';
 import {
     Button,
@@ -196,11 +197,15 @@ function App() {
         }
     };
 
+    const store = useStoreApi();
+
+    const clearSelectedNode = () => store.getState().unselectNodesAndEdges();
+
     const locker = () => {
         if (blockSelection) {
-            setSelectedNode(undefined);
             setBlockSelectionName('Unblocked clicks');
             setBlockSelectionImage(<UnlockIcon/>);
+            clearSelectedNode();
         } else {
             setBlockSelectionName('Blocked clicks');
             setBlockSelectionImage(<LockIcon/>);
