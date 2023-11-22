@@ -21,8 +21,12 @@ import {
     GridItem,
     ChakraProvider,
     Tag,
-    Box
 } from "@chakra-ui/react";
+
+import {
+    UnlockIcon,
+    LockIcon
+} from "@chakra-ui/icons";
 import './App.css';
 import 'reactflow/dist/style.css';
 import {highlightPath, resetNodeStyles} from "./highlight";
@@ -79,6 +83,12 @@ function App() {
     let [maxValReq, setMaxValReq] = React.useState('100');
 
     let [lastSelLayout, setLastSelLayout] = React.useState('DOWN');
+    let [blockSelection, setBlockSelection] = React.useState(false);
+    let [blockSelectionName, setBlockSelectionName] = React.useState('Unblocked clicks');
+    let [blockSelectionImage, setBlockSelectionImage] = React.useState(<UnlockIcon/>);
+
+    const [, updateState] = React.useState();
+    const forceUpdate = React.useCallback(() => updateState({}), []);
 
 
     let [valueLeftSize, setValueLeftSize] = React.useState('0')
@@ -186,6 +196,19 @@ function App() {
         }
     };
 
+    const locker = () => {
+        if (blockSelection) {
+            setSelectedNode(undefined);
+            setBlockSelectionName('Unblocked clicks');
+            setBlockSelectionImage(<UnlockIcon/>);
+        } else {
+            setBlockSelectionName('Blocked clicks');
+            setBlockSelectionImage(<LockIcon/>);
+        }
+        setBlockSelection(!blockSelection);
+    }
+
+
     return (
         <Grid w="100vw" h="100vh" templateColumns="repeat(6, 1fr)" gap={0}>
             <GridItem borderRight="1px solid" borderColor="gray.200">
@@ -233,47 +256,51 @@ function App() {
                         </Grid>
                     </GridItem>
                     <GridItem p={4}>
-                        <Button id='fitview_button' mt={4} variant='solid' width='100%' onClick={fitView}>Reset
-                            view</Button>
-                    </GridItem>
-                </Grid>
-            </GridItem>
-
-            <GridItem colSpan={5}>
-
-                <ReactFlow
-                    nodes={nodes}
-                    edges={edges}
-                    //onConnect={onConnect}
-                    onNodesChange={onNodesChange}
-                    onEdgesChange={onEdgesChange}
-                    fitView
-                    elementsSelectable={true}
-                    onSelectionChange={(selectedElements) => {
-                        const node = selectedElements.nodes[0]
-                        if (node == null) {
-                            resetNodeStyles(setNodes, setEdges)
-                            setSelectedNode(undefined)
-                        } else {
-                            setSelectedNode(node)
-                            highlightPath(node, nodes, edges, true, setNodes, setEdges)
-                        }
-                    }}
-                >
-                </ReactFlow>
-                {/*</div>*/}
+                        <Button id='locker' mt={4} isActive={blockSelection} variant='solid' width='100%'
+                                onClick={locker} rightIcon={blockSelectionImage}>{blockSelectionName}</Button>
+                    <Button id='fitview_button' mt={4} variant='solid' width='100%' onClick={fitView}>Reset
+                        view</Button>
             </GridItem>
         </Grid>
-    )
-        ;
+</GridItem>
+
+    <GridItem colSpan={5}>
+
+        <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            //onConnect={onConnect}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            fitView
+            elementsSelectable={true}
+            onSelectionChange={(selectedElements) => {
+                if (!blockSelection) {
+                    const node = selectedElements.nodes[0]
+                    if (node == null) {
+                        resetNodeStyles(setNodes, setEdges)
+                        setSelectedNode(undefined)
+                    } else {
+                        setSelectedNode(node)
+                        highlightPath(node, nodes, edges, true, setNodes, setEdges)
+                    }
+                }
+            }}
+        >
+        </ReactFlow>
+        {/*</div>*/}
+    </GridItem>
+</Grid>
+)
+;
 }
 
 export default () => (
-    <ChakraProvider>
-        <ReactFlowProvider>
-            <App/>
-        </ReactFlowProvider>
-    </ChakraProvider>
+<ChakraProvider>
+<ReactFlowProvider>
+<App/>
+</ReactFlowProvider>
+</ChakraProvider>
 );
 
 
