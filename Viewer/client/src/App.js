@@ -13,7 +13,9 @@ import ReactFlow, {
     getIncomers,
     isEdge,
     isNode,
-    useStoreApi
+    useStoreApi,
+    Controls,
+    ControlButton
 } from 'reactflow';
 import {
     Button,
@@ -22,11 +24,13 @@ import {
     GridItem,
     ChakraProvider,
     Tag,
+    IconButton
 } from "@chakra-ui/react";
 
 import {
     UnlockIcon,
-    LockIcon
+    LockIcon,
+    ArrowRightIcon
 } from "@chakra-ui/icons";
 import './App.css';
 import 'reactflow/dist/style.css';
@@ -87,6 +91,10 @@ function App() {
     let [blockSelection, setBlockSelection] = React.useState(false);
     let [blockSelectionName, setBlockSelectionName] = React.useState('Unblocked clicks');
     let [blockSelectionImage, setBlockSelectionImage] = React.useState(<UnlockIcon/>);
+
+    let [hidePanel, setHidePanel] = React.useState(false);
+    let [graphView, setGraphView] = React.useState(5);
+
 
     const [, updateState] = React.useState();
     const forceUpdate = React.useCallback(() => updateState({}), []);
@@ -213,11 +221,23 @@ function App() {
         setBlockSelection(!blockSelection);
     }
 
+    const hide_panel = () => {
+        setHidePanel(true);
+        setGraphView(6);
+        setTimeout(fitView, 15);
+    };
+
+    const show_panel = () => {
+        setHidePanel(false);
+        setGraphView(5);
+        setTimeout(fitView, 15);
+    };
+
 
     return (
         <Grid w="100vw" h="100vh" templateColumns="repeat(6, 1fr)" gap={0}>
-            <GridItem borderRight="1px solid" borderColor="gray.200">
-                <Grid templateRaws="repeat(3, 1fr)" gap={0}>
+            <GridItem borderRight="1px solid" borderColor="gray.200" hidden={hidePanel}>
+                <Grid templateRaws="repeat(4, 1fr)" gap={0}>
                     {/*<div style={{width: '100vw', height: '100vh'}}>*/}
                     <GridItem p={4}>
                         <label>
@@ -245,7 +265,7 @@ function App() {
                         <Heading as='h5' size='sm' mt={6}>by requirements count:</Heading>
                         {SliderMarkExample(maxValReq, valueLeftReq, setValueLeftReq, valueRightReq, setValueRightReq)}
 
-                        <Button id="apply" w='100%' mt={4} onClick={() => {
+                        <Button id="apply" w='100%' mt={4} mb={4} onClick={() => {
                             setValueLeftReq('0');
                             setValueLeftSize('0');
                             setValueRightReq(maxValReq);
@@ -253,16 +273,22 @@ function App() {
                         }}>Reset filters</Button>
 
                     </GridItem>
-                    <GridItem p={4}>
+                    <GridItem p={4} borderBottom="1px solid" borderColor="gray.200">
                         <Button id='locker' mt={4} isActive={blockSelection} variant='solid' width='100%'
                                 onClick={locker} rightIcon={blockSelectionImage}>{blockSelectionName}</Button>
-                        <Button id='fitview_button' mt={4} variant='solid' width='100%' onClick={fitView}>Reset
+                        <Button id='fitview_button' mt={4} mb={4} variant='solid' width='100%' onClick={fitView}>Reset
                             view</Button>
+                    </GridItem>
+
+                    <GridItem p={4} alignSelf="end">
+                        <Button id='hide_panel' mt={4}
+                                variant='solid' width='100%'
+                                onClick={hide_panel}>Hide panel</Button>
                     </GridItem>
                 </Grid>
             </GridItem>
 
-            <GridItem colSpan={5}>
+            <GridItem colSpan={graphView}>
 
                 <ReactFlow
                     nodes={nodes}
@@ -285,8 +311,13 @@ function App() {
                         }
                     }}
                 >
+                    <Controls>
+                        <ControlButton id='show_panel' onClick={show_panel} hidden={!hidePanel}
+                                       style={{'font-weight': "bold"}}>P
+                        </ControlButton>
+                    </Controls>
                 </ReactFlow>
-                {/*</div>*/}
+
             </GridItem>
         </Grid>
     )
