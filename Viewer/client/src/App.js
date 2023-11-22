@@ -78,6 +78,9 @@ function App() {
     let [maxValSize, setMaxValSize] = React.useState('100');
     let [maxValReq, setMaxValReq] = React.useState('100');
 
+    let [lastSelLayout, setLastSelLayout] = React.useState('DOWN');
+
+
     let [valueLeftSize, setValueLeftSize] = React.useState('0')
     let [valueRightSize, setValueRightSize] = React.useState(maxValSize)
     let [valueLeftReq, setValueLeftReq] = React.useState('0')
@@ -96,7 +99,7 @@ function App() {
             const opts = {'elk.direction': direction, ...elkOptions};
             const ns = useInitialNodes ? initialNodes : nodes;
             const es = useInitialNodes ? initialEdges : edges;
-
+            setLastSelLayout(direction);
             getLayoutedElements(ns, es, opts).then(({nodes: layoutedNodes, edges: layoutedEdges}) => {
                 setNodes(layoutedNodes);
                 setEdges(layoutedEdges);
@@ -175,11 +178,11 @@ function App() {
             setNodes([]);
 
             jsonData.forEach(newGraphFromJS)
-            const forceLayout = document.getElementById("vert");
-            await sleep(10);
+            const forceLayout = document.getElementById(lastSelLayout);
+            await sleep(15);
             forceLayout.click();
-            await sleep(10);
-            setTimeout(fitView, 10);
+            await sleep(15);
+            setTimeout(fitView, 15);
         }
     };
 
@@ -197,11 +200,11 @@ function App() {
                         <Heading as='h4' size='md' mt={4}>Layout style:</Heading>
                         <Grid templateColumns='repeat(2, 1fr)' gap={6}>
                             <GridItem w='100%'>
-                                <Button id="vert" w='100%' onClick={() => onLayout({direction: 'DOWN'})}
+                                <Button id="DOWN" w='100%' onClick={() => onLayout({direction: 'DOWN'})}
                                         mt={4}>Vertical</Button>
                             </GridItem>
                             <GridItem w='100%'>
-                                <Button id="hor" w='100%' style={{float: 'right'}}
+                                <Button id="RIGHT" w='100%' style={{float: 'right'}}
                                         onClick={() => onLayout({direction: 'RIGHT'})}
                                         mt={4} mb={4}>Horizontal</Button>
                             </GridItem>
