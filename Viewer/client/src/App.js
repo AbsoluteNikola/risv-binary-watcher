@@ -239,68 +239,61 @@ function App() {
                         {SliderMarkExample(maxValSize, valueLeftSize, setValueLeftSize, valueRightSize, setValueRightSize)}
                         <Heading as='h5' size='sm' mt={6}>by requirements count:</Heading>
                         {SliderMarkExample(maxValReq, valueLeftReq, setValueLeftReq, valueRightReq, setValueRightReq)}
-                        <Grid templateColumns='repeat(2, 1fr)' gap={6} mb={4}>
-                            <GridItem w='100%'>
-                                <Button id="apply" w='100%' mt={4} onClick={() => {
-                                    setValueLeftReq('0');
-                                    setValueLeftSize('0');
-                                    setValueRightReq(maxValReq);
-                                    setValueRightSize(maxValSize);
-                                }}>Reset</Button>
-                            </GridItem>
-                            <GridItem w='100%'>
-                                <Button id="resetf" w='100%' style={{float: 'right'}}
-                                        onClick={() => onLayout({direction: 'RIGHT'})}
-                                        mt={4}>Apply</Button>
-                            </GridItem>
-                        </Grid>
+
+                        <Button id="apply" w='100%' mt={4} onClick={() => {
+                            setValueLeftReq('0');
+                            setValueLeftSize('0');
+                            setValueRightReq(maxValReq);
+                            setValueRightSize(maxValSize);
+                        }}>Reset filters</Button>
+
                     </GridItem>
                     <GridItem p={4}>
                         <Button id='locker' mt={4} isActive={blockSelection} variant='solid' width='100%'
                                 onClick={locker} rightIcon={blockSelectionImage}>{blockSelectionName}</Button>
-                    <Button id='fitview_button' mt={4} variant='solid' width='100%' onClick={fitView}>Reset
-                        view</Button>
+                        <Button id='fitview_button' mt={4} variant='solid' width='100%' onClick={fitView}>Reset
+                            view</Button>
+                    </GridItem>
+                </Grid>
+            </GridItem>
+
+            <GridItem colSpan={5}>
+
+                <ReactFlow
+                    nodes={nodes}
+                    edges={edges}
+                    //onConnect={onConnect}
+                    onNodesChange={onNodesChange}
+                    onEdgesChange={onEdgesChange}
+                    fitView
+                    elementsSelectable={true}
+                    onSelectionChange={(selectedElements) => {
+                        if (!blockSelection) {
+                            const node = selectedElements.nodes[0]
+                            if (node == null) {
+                                resetNodeStyles(setNodes, setEdges)
+                                setSelectedNode(undefined)
+                            } else {
+                                setSelectedNode(node)
+                                highlightPath(node, nodes, edges, true, setNodes, setEdges)
+                            }
+                        }
+                    }}
+                >
+                </ReactFlow>
+                {/*</div>*/}
             </GridItem>
         </Grid>
-</GridItem>
-
-    <GridItem colSpan={5}>
-
-        <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            //onConnect={onConnect}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            fitView
-            elementsSelectable={true}
-            onSelectionChange={(selectedElements) => {
-                if (!blockSelection) {
-                    const node = selectedElements.nodes[0]
-                    if (node == null) {
-                        resetNodeStyles(setNodes, setEdges)
-                        setSelectedNode(undefined)
-                    } else {
-                        setSelectedNode(node)
-                        highlightPath(node, nodes, edges, true, setNodes, setEdges)
-                    }
-                }
-            }}
-        >
-        </ReactFlow>
-        {/*</div>*/}
-    </GridItem>
-</Grid>
-)
-;
+    )
+        ;
 }
 
 export default () => (
-<ChakraProvider>
-<ReactFlowProvider>
-<App/>
-</ReactFlowProvider>
-</ChakraProvider>
+    <ChakraProvider>
+        <ReactFlowProvider>
+            <App/>
+        </ReactFlowProvider>
+    </ChakraProvider>
 );
 
 
