@@ -84,8 +84,8 @@ const getLayoutedElements = (nodes, edges, options = {}) => {
 
 function App() {
     let [file_sel, setFileSel] = React.useState('No file selected');
-    let [maxValSize, setMaxValSize] = React.useState('100');
-    let [maxValReq, setMaxValReq] = React.useState('100');
+    let [maxValSize, setMaxValSize] = React.useState('1');
+    let [maxValReq, setMaxValReq] = React.useState('1');
 
     let [lastSelLayout, setLastSelLayout] = React.useState('DOWN');
     let [blockSelection, setBlockSelection] = React.useState(false);
@@ -162,6 +162,8 @@ function App() {
     }
 
     const def_position = {x: 0, y: 0};
+    let _maxValSize = 1;
+    let _maxValReq = 1;
 
     function newGraphFromJS(raw_node) {
         setNodes((nds) => nds.concat({
@@ -170,6 +172,14 @@ function App() {
             data: {label: raw_node.Name + '\nversion ' + raw_node.Version},
             size: parseInt(raw_node.Size)
         }));
+        const intSize = parseInt(raw_node.Size);
+        const reqSize = raw_node.Requirements.length
+        if (intSize > _maxValSize) {
+            _maxValSize = intSize;
+        }
+        if (reqSize > _maxValReq) {
+            _maxValReq = reqSize;
+        }
         raw_node.Requirements.forEach((e) =>
             setEdges((edgs) => edgs.concat({
                 id: 'e' + raw_node.Id.toString() + e.toString(),
@@ -187,6 +197,8 @@ function App() {
 
     const onChangeFile = async (e) => {
         const files = (e.target).files;
+        _maxValReq = 1;
+        _maxValSize = 1;
 
         if (files != null) {
             let file = files[0];
@@ -197,6 +209,11 @@ function App() {
             setNodes([]);
 
             jsonData.forEach(newGraphFromJS)
+            setMaxValReq(_maxValReq);
+            setMaxValSize(_maxValSize);
+            setValueRightReq(_maxValReq);
+            setValueRightSize(_maxValSize);
+
             const forceLayout = document.getElementById(lastSelLayout);
             await sleep(15);
             forceLayout.click();
