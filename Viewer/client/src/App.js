@@ -17,21 +17,11 @@ import ReactFlow, {
 import {
     Button,
     Heading,
-    FormControl,
-    FormLabel,
     Grid,
     GridItem,
-    Text,
-    Input,
-    Select,
-    Stack,
     ChakraProvider,
-    Slider,
-    SliderTrack,
-    SliderFilledTrack,
-    SliderThumb,
-    SliderMark,
-    Tooltip
+    Tag,
+    Box
 } from "@chakra-ui/react";
 import './App.css';
 import 'reactflow/dist/style.css';
@@ -84,6 +74,16 @@ const getLayoutedElements = (nodes, edges, options = {}) => {
 };
 
 function App() {
+    let [file_sel, setFileSel] = React.useState('No file selected');
+    let [maxValSize, setMaxValSize] = React.useState('100');
+    let [maxValReq, setMaxValReq] = React.useState('100');
+
+    let [valueLeftSize, setValueLeftSize] = React.useState('0')
+    let [valueRightSize, setValueRightSize] = React.useState(maxValSize)
+    let [valueLeftReq, setValueLeftReq] = React.useState('0')
+    let [valueRightReq, setValueRightReq] = React.useState(maxValReq)
+
+
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const {fitView} = useReactFlow();
@@ -169,7 +169,7 @@ function App() {
         if (files != null) {
             let file = files[0];
             if (file == null) return;
-            console.log(file.text());
+            setFileSel(file.name);
             let jsonData = JSON.parse(await file.text())
             setEdges([]);
             setNodes([]);
@@ -185,22 +185,55 @@ function App() {
 
     return (
         <Grid w="100vw" h="100vh" templateColumns="repeat(6, 1fr)" gap={0}>
-            <GridItem p={4} borderRight="1px solid" borderColor="gray.200">
-                {/*<div style={{width: '100vw', height: '100vh'}}>*/}
-                <label>
-                    <input type="file" style={{display: 'none'}} onChange={(e) => onChangeFile(e)}/>
-                    <Button as="span" variant='solid' width='100%'>Upload File</Button>
-                </label>
-                <Heading as='h4' size='md' mt={4}>Layout style:</Heading>
-                <Button id="vert" onClick={() => onLayout({direction: 'DOWN'})} width='45%' mt={4}>VERTICAL</Button>
-                <Button id="hor" style={{float: 'right'}} onClick={() => onLayout({direction: 'RIGHT'})} width='45%'
-                        mt={4}>HORIZONTAL</Button>
-                <Heading as='h4' size='md' mt={4}>Filters:</Heading>
-                <Heading as='h5' size='sm' mt={4}>by size:</Heading>
-                {SliderMarkExample(useState)}
-                <Heading as='h5' size='sm' mt={10}>by requirements count:</Heading>
-                {SliderMarkExample(useState)}
-                <Button id='fitview_button' variant='solid' width='100%' onClick={fitView}>Reset</Button>
+            <GridItem borderRight="1px solid" borderColor="gray.200">
+                <Grid templateRaws="repeat(3, 1fr)" gap={0}>
+                    {/*<div style={{width: '100vw', height: '100vh'}}>*/}
+                    <GridItem p={4}>
+                        <label>
+                            <input type="file" style={{display: 'none'}} onChange={(e) => onChangeFile(e)}/>
+                            <Button as="span" variant='solid' width='100%'>Upload File</Button>
+                        </label>
+                        <Tag variant='ghost' mt={2} w='100%'>{file_sel}</Tag>
+                        <Heading as='h4' size='md' mt={4}>Layout style:</Heading>
+                        <Grid templateColumns='repeat(2, 1fr)' gap={6}>
+                            <GridItem w='100%'>
+                                <Button id="vert" w='100%' onClick={() => onLayout({direction: 'DOWN'})}
+                                        mt={4}>Vertical</Button>
+                            </GridItem>
+                            <GridItem w='100%'>
+                                <Button id="hor" w='100%' style={{float: 'right'}}
+                                        onClick={() => onLayout({direction: 'RIGHT'})}
+                                        mt={4} mb={4}>Horizontal</Button>
+                            </GridItem>
+                        </Grid>
+                    </GridItem>
+                    <GridItem p={4} borderTop="1px solid" borderBottom="1px solid" borderColor="gray.200">
+                        <Heading as='h4' size='md' mt={4}>Filters:</Heading>
+                        <Heading as='h5' size='sm' mt={4}>by size:</Heading>
+                        {SliderMarkExample(maxValSize, valueLeftSize, setValueLeftSize, valueRightSize, setValueRightSize)}
+                        <Heading as='h5' size='sm' mt={6}>by requirements count:</Heading>
+                        {SliderMarkExample(maxValReq, valueLeftReq, setValueLeftReq, valueRightReq, setValueRightReq)}
+                        <Grid templateColumns='repeat(2, 1fr)' gap={6} mb={4}>
+                            <GridItem w='100%'>
+                                <Button id="apply" w='100%' mt={4} onClick={() => {
+                                    setValueLeftReq('0');
+                                    setValueLeftSize('0');
+                                    setValueRightReq(maxValReq);
+                                    setValueRightSize(maxValSize);
+                                }}>Reset</Button>
+                            </GridItem>
+                            <GridItem w='100%'>
+                                <Button id="resetf" w='100%' style={{float: 'right'}}
+                                        onClick={() => onLayout({direction: 'RIGHT'})}
+                                        mt={4}>Apply</Button>
+                            </GridItem>
+                        </Grid>
+                    </GridItem>
+                    <GridItem p={4}>
+                        <Button id='fitview_button' mt={4} variant='solid' width='100%' onClick={fitView}>Reset
+                            view</Button>
+                    </GridItem>
+                </Grid>
             </GridItem>
 
             <GridItem colSpan={5}>

@@ -1,41 +1,63 @@
-import {Slider, SliderFilledTrack, SliderMark, SliderThumb, SliderTrack} from "@chakra-ui/react";
+import {
+    RangeSlider,
+    RangeSliderTrack,
+    RangeSliderFilledTrack,
+    RangeSliderThumb,
+    NumberInput,
+    NumberInputField,
+    NumberInputStepper,
+    NumberIncrementStepper,
+    NumberDecrementStepper,
+    Grid,
+    GridItem
+} from "@chakra-ui/react";
+
 import React from "react";
 
-export function SliderMarkExample(useState) {
-    const [sliderValue, setSliderValue] = useState(50)
 
-    const labelStyles = {
-        mt: '2',
-        ml: '-2.5',
-        fontSize: 'sm',
+export function SliderMarkExample(maxVal, valueLeft, setValueLeft, valueRight, setValueRight) {
+
+    const handleChangeLeft = (value) => setValueLeft(value);
+    const handleChangeRight = (value) => setValueRight(value);
+    const handleChangeBoth = (value) => {
+        setValueLeft(value[0]);
+        setValueRight(value[1]);
     }
 
     return (
-        <Slider mt={50} aria-label='slider-ex-6' onChange={(val) => setSliderValue(val)}>
-            <SliderMark value={25} {...labelStyles}>
-                25%
-            </SliderMark>
-            <SliderMark value={50} {...labelStyles}>
-                50%
-            </SliderMark>
-            <SliderMark value={75} {...labelStyles}>
-                75%
-            </SliderMark>
-            <SliderMark
-                value={sliderValue}
-                textAlign='center'
-                bg='blue.500'
-                color='white'
-                mt='-10'
-                ml='-5'
-                w='12'
-            >
-                {sliderValue}%
-            </SliderMark>
-            <SliderTrack>
-                <SliderFilledTrack/>
-            </SliderTrack>
-            <SliderThumb/>
-        </Slider>
+        <>
+            <RangeSlider mt={4} aria-label={['min', 'max']} value={[valueLeft, valueRight]} min={0} max={maxVal}
+                         step={1} onChange={handleChangeBoth}>
+                <RangeSliderTrack>
+                    <RangeSliderFilledTrack/>
+                </RangeSliderTrack>
+                <RangeSliderThumb index={0}/>
+                <RangeSliderThumb index={1}/>
+            </RangeSlider>
+            <Grid templateColumns='repeat(2, 1fr)' gap={6}>
+                <GridItem w='100%'>
+                    <NumberInput value={valueLeft} min={0} max={valueRight}
+                                 onChange={handleChangeLeft}>
+                        <NumberInputField/>
+                        <NumberInputStepper>
+                            <NumberIncrementStepper/>
+                            <NumberDecrementStepper/>
+                        </NumberInputStepper>
+                    </NumberInput>
+                </GridItem>
+                <GridItem w='100%'>
+                    <NumberInput style={{float: 'right'}} value={valueRight}
+                                 min={valueLeft} max={maxVal}
+                                 onChange={handleChangeRight}>
+                        <NumberInputField/>
+                        <NumberInputStepper>
+                            <NumberIncrementStepper/>
+                            <NumberDecrementStepper/>
+                        </NumberInputStepper>
+                    </NumberInput>
+                </GridItem>
+            </Grid>
+        </>
+
     )
 }
