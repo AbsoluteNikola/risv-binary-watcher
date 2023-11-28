@@ -1,6 +1,7 @@
 package main
 
 import (
+	"binary_watcher/internal/rpm_analyzer"
 	"fmt"
 	"os"
 )
@@ -23,9 +24,9 @@ func main() {
 		fmt.Println("incorrect path to directory for output file")
 		return
 	}
-	node := buildGraph(rpmPackageName)
+	node := rpm_analyzer.BuildGraph(rpmPackageName)
 
 	if node != nil {
-		printNode(node)
+		rpm_analyzer.PrintNode(node)
 	}
 }

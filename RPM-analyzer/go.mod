@@ -1,3 +1,3 @@
-module RPM-analyzer
+module binary_watcher
 
 go 1.21.4

@@ -1,44 +1,44 @@
-package main
+package rpm_analyzer
 
 import (
 	"fmt"
 	"strings"
 )
 
-type node struct {
+type Node struct {
 	id           int
 	name         string
 	version      string
 	size         string
 	installDate  string
-	requirements []*node
+	requirements []*Node
 }
 
-func (p *node) addRequirement(c *node) {
-	p.requirements = append((*p).requirements, c)
-}
-
-func createNode(id int, name string, version string, size string, installDate string) *node {
-	p := new(node)
-	p.id = id
-	p.name = name
-	p.version = version
-	p.size = size
-	p.installDate = installDate
-	p.requirements = []*node{}
-
-	return p
-}
-
-func buildGraph(rpmPackageName string) *node {
+func BuildGraph(rpmPackageName string) *Node {
 	counter := 0
-	seen := map[string]*node{}
+	seen := map[string]*Node{}
 	depth := 0
 
 	return buildGraphRec(rpmPackageName, depth, &seen, &counter)
 }
 
-func buildGraphRec(packageName string, depth int, seen *map[string]*node, counter *int) *node {
+func PrintNode(head *Node) {
+	fmt.Println(serializeNodeToJson(head))
+}
+
+func createNode(id int, name string, version string, size string, installDate string) *Node {
+	p := new(Node)
+	p.id = id
+	p.name = name
+	p.version = version
+	p.size = size
+	p.installDate = installDate
+	p.requirements = []*Node{}
+
+	return p
+}
+
+func buildGraphRec(packageName string, depth int, seen *map[string]*Node, counter *int) *Node {
 	if depth > 5 {
 		return nil
 	}
@@ -66,12 +66,7 @@ func buildGraphRec(packageName string, depth int, seen *map[string]*node, counte
 	return node
 }
 
-func getLeafNode(counter *int, packageName string) *node {
-	*counter++
-	return createNode(*counter, packageName, "", "", "")
-}
-
-func getNodeFromRpmInfo(counter *int, requirement string) *node {
+func getNodeFromRpmInfo(counter *int, requirement string) *Node {
 	if requirement == "" {
 		return nil
 	}
@@ -87,6 +82,11 @@ func getNodeFromRpmInfo(counter *int, requirement string) *node {
 		requirementParts[3])
 }
 
-func printNode(head *node) {
-	fmt.Println(serializeNodeToJson(head))
+func (p *Node) addRequirement(c *Node) {
+	p.requirements = append((*p).requirements, c)
+}
+
+func getLeafNode(counter *int, packageName string) *Node {
+	*counter++
+	return createNode(*counter, packageName, "", "", "")
 }

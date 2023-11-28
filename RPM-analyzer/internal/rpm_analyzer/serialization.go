@@ -1,4 +1,4 @@
-package main
+package rpm_analyzer
 
 import (
 	"encoding/json"
@@ -14,7 +14,7 @@ type nodePresentation struct {
 	Requirements []int
 }
 
-func mapTreeToNodeModelArray(node *node, visited map[*node]bool) []nodePresentation {
+func mapTreeToNodeModelArray(node *Node, visited map[*Node]bool) []nodePresentation {
 	if visited[node] {
 		return []nodePresentation{}
 	}
@@ -31,7 +31,7 @@ func mapTreeToNodeModelArray(node *node, visited map[*node]bool) []nodePresentat
 	return result
 }
 
-func mapNodeToNodeModel(node *node) nodePresentation {
+func mapNodeToNodeModel(node *Node) nodePresentation {
 	var child = node.requirements
 	var childIds = make([]int, 0)
 
@@ -51,8 +51,8 @@ func mapNodeToNodeModel(node *node) nodePresentation {
 	return model
 }
 
-func serializeNodeToJson(root *node) string {
-	var nodeModel = mapTreeToNodeModelArray(root, make(map[*node]bool))
+func serializeNodeToJson(root *Node) string {
+	var nodeModel = mapTreeToNodeModelArray(root, make(map[*Node]bool))
 	var bytes, err = json.MarshalIndent(nodeModel, "", "  ")
 
 	if err != nil {
