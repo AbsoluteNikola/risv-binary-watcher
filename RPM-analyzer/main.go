@@ -27,6 +27,6 @@ func main() {
 	node := rpm_analyzer.BuildGraph(rpmPackageName)
 
 	if node != nil {
-		rpm_analyzer.PrintNode(node)
+		rpm_analyzer.Print(node)
 	}
 }

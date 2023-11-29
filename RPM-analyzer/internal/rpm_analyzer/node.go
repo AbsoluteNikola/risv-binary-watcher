@@ -22,7 +22,7 @@ func BuildGraph(rpmPackageName string) *Node {
 	return buildGraphRec(rpmPackageName, depth, &seen, &counter)
 }
 
-func PrintNode(head *Node) {
+func Print(head *Node) {
 	fmt.Println(serializeNodeToJson(head))
 }
 
