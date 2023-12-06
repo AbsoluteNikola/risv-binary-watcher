@@ -3,6 +3,7 @@ package go_analyzer
 import (
 	"fmt"
 	"os/exec"
+	"regexp"
 	"strings"
 )
 
@@ -11,26 +12,20 @@ func getNodeFromPackage(projectPath string, packageName string, counter *int) (*
 		packageName = GetModuleName(projectPath)
 	}
 
-	goListResponseBracked := RunGoList(projectPath, packageName)
+	goListResponse := RunGoList(projectPath, packageName)
 
-	fmt.Println(goListResponseBracked)
+	fmt.Println(goListResponse)
 
-	if goListResponseBracked == "" {
+	if goListResponse == "" {
 		return getLeafNode(counter, packageName), &[]string{}
 	}
 
-	goListResponse := goListResponseBracked[1 : len(goListResponseBracked)-1]
-
 	imports := strings.Split(goListResponse, " ")
 
-	fmt.Println(imports)
-
-	return createNode(*counter, packageName), &imports
+	return createNode(counter, packageName), &imports
 }
 
 func RunGoList(projectPath string, packageName string) string {
-	fmt.Println("ProjPath = " + projectPath)
-	fmt.Println("PackageName = " + packageName)
 	cmd := exec.Command(
 		"go",
 		"list",
@@ -43,7 +38,10 @@ func RunGoList(projectPath string, packageName string) string {
 		return "" //TODO: Error handling need to be reworked
 	}
 
-	return string(stdout)
+	var response = string(stdout)
+	response = regexp.MustCompile(`[\[\]'\n]+`).ReplaceAllString(response, "")
+
+	return response
 }
 
 func GetModuleName(projectPath string) string {
@@ -57,5 +55,5 @@ func GetModuleName(projectPath string) string {
 		return "" //TODO: Error handling need to be reworked
 	}
 
-	return string(stdout)
+	return string(stdout)[:len(string(stdout))-1]
 }

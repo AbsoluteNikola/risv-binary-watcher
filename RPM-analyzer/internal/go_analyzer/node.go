@@ -24,9 +24,12 @@ func Print(head *Node) {
 	fmt.Println(serializeNodeToJson(head))
 }
 
-func createNode(id int, packageName string) *Node {
+func createNode(counter *int, packageName string) *Node {
+	*counter++
+
 	p := new(Node)
-	p.id = id
+	p.id = *counter
+	p.packageName = packageName
 	p.imports = []*Node{}
 
 	return p
@@ -65,6 +68,5 @@ func (p *Node) addImport(c *Node) {
 }
 
 func getLeafNode(counter *int, packageName string) *Node {
-	*counter++
-	return createNode(*counter, packageName)
+	return createNode(counter, packageName)
 }

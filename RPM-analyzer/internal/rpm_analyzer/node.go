@@ -26,9 +26,11 @@ func Print(head *Node) {
 	fmt.Println(serializeNodeToJson(head))
 }
 
-func createNode(id int, name string, version string, size string, installDate string) *Node {
+func createNode(counter *int, name string, version string, size string, installDate string) *Node {
+	*counter++
+
 	p := new(Node)
-	p.id = id
+	p.id = *counter
 	p.name = name
 	p.version = version
 	p.size = size
@@ -73,9 +75,8 @@ func getNodeFromRpmInfo(counter *int, requirement string) *Node {
 
 	requirementParts := strings.SplitN(requirement, " ", 4)
 
-	*counter++
 	return createNode(
-		*counter,
+		counter,
 		requirementParts[0],
 		requirementParts[1],
 		requirementParts[2],
@@ -87,6 +88,5 @@ func (p *Node) addRequirement(c *Node) {
 }
 
 func getLeafNode(counter *int, packageName string) *Node {
-	*counter++
-	return createNode(*counter, packageName, "", "", "")
+	return createNode(counter, packageName, "", "", "")
 }

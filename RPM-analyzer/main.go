@@ -12,7 +12,6 @@ func main() {
 }
 
 func rpmAnalyzerCli() {
-
 	args := os.Args[1:]
 
 	if len(args) != 2 {
@@ -40,7 +39,6 @@ func rpmAnalyzerCli() {
 func goAnalyzerCli() {
 	args := os.Args[1:]
 
-	//project path
 	if len(args) != 1 {
 		fmt.Println("expected path to project's directory")
 		return
