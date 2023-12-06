@@ -11,7 +11,6 @@ import {
     Grid,
     GridItem
 } from "@chakra-ui/react";
-import useTimeout from './useTimeout';
 import React from "react";
 
 

@@ -160,11 +160,13 @@ function App() {
     let _maxValReq = 1;
 
     function newGraphFromJSNodes(raw_node) {
+        const reqSize = (new Set(raw_node.Requirements)).size;
         setNodes((nds) => nds.concat({
             id: raw_node.Id.toString(),
             position: def_position,
             data: {label: raw_node.Name + '\nversion ' + raw_node.Version},
-            size: parseInt(raw_node.Size)
+            size: parseInt(raw_node.Size),
+            reqs: reqSize
         }));
 
     }
@@ -254,11 +256,26 @@ function App() {
     };
 
 
-
     const [filterTask] = useTimeout(() => {
-        console.log("aaa");
+        const hiddenIds = [];
+        setNodes((aNodes) => {
+                return aNodes?.map((elem) => {
+                    elem.hidden = elem.size < valueLeftSize || elem.size > valueRightSize || elem.reqs < valueLeftReq || elem.reqs > valueRightReq;
+                    if (elem.hidden === true) {
+                        hiddenIds.push(elem.id);
+                    }
+                    return elem
+                })
+            }
+        )
+        setEdges((aEdges) => {
+                return aEdges?.map((elem) => {
+                    elem.hidden = hiddenIds.includes(elem.target) || hiddenIds.includes(elem.source);
+                    return elem
+                })
+            }
+        )
     }, 1500);
-
 
 
     return (
