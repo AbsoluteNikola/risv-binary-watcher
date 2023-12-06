@@ -42,7 +42,10 @@ func buildGraphRec(packageName string, moduleName string, projectPath string, se
 	}
 
 	if !strings.HasPrefix(packageName, moduleName) {
-		return getLeafNode(counter, packageName)
+		leaf := getLeafNode(counter, packageName)
+		(*seen)[packageName] = leaf
+
+		return leaf
 	}
 
 	node, imports := getNodeFromPackage(projectPath, packageName, counter)
