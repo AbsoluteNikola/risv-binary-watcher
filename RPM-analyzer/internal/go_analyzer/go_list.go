@@ -1,7 +1,6 @@
 package go_analyzer
 
 import (
-	"fmt"
 	"os/exec"
 	"regexp"
 	"strings"
@@ -13,8 +12,6 @@ func getNodeFromPackage(projectPath string, packageName string, counter *int) (*
 	}
 
 	goListResponse := RunGoList(projectPath, packageName)
-
-	fmt.Println(goListResponse)
 
 	if goListResponse == "" {
 		return getLeafNode(counter, packageName), &[]string{}
