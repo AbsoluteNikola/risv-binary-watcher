@@ -1,87 +1,5 @@
 import {getIncomers, getOutgoers} from "reactflow";
 
-const getAllIncomers = (node, nodes, edges, prevIncomers = []) => {
-    const incomers = getIncomers(node, nodes, edges);
-    return incomers.reduce(
-        (memo, incomer) => {
-            memo.push(incomer);
-
-            if ((prevIncomers.findIndex(n => n.id === incomer.id) === -1)) {
-                prevIncomers.push(incomer);
-
-                getAllIncomers(incomer, nodes, edges, prevIncomers).forEach((foundNode) => {
-                    memo.push(foundNode);
-
-                    if ((prevIncomers.findIndex(n => n.id === foundNode.id) === -1)) {
-                        prevIncomers.push(incomer);
-
-                    }
-                });
-            }
-            return memo;
-        },
-        []
-    );
-}
-
-const getAllOutgoers = (node, nodes, edges, prevOutgoers = []) => {
-    const outgoers = getOutgoers(node, nodes, edges);
-    return outgoers.reduce(
-        (memo, outgoer) => {
-            memo.push(outgoer);
-
-            if ((prevOutgoers.findIndex(n => n.id === outgoer.id) === -1)) {
-                prevOutgoers.push(outgoer);
-
-                getAllOutgoers(outgoer, nodes, edges, prevOutgoers).forEach((foundNode) => {
-                    memo.push(foundNode);
-
-                    if ((prevOutgoers.findIndex(n => n.id === foundNode.id) === -1)) {
-                        prevOutgoers.push(foundNode);
-                    }
-                });
-            }
-            return memo;
-        },
-        []
-    )
-}
-
-// const getIncomers = (node, nodes, edges) => {
-//     if (!isNode(node)) {
-//         return [];
-//     }
-//
-//     const incomersIds = edges
-//         .filter((e) => e.target === node.id)
-//         .map((e) => e.source);
-//
-//     return nodes.filter((e) => incomersIds.map((id) => {
-//         const matches = /([\w-^]+)__([\w-]+)/.exec(id);
-//         if (matches === null) {
-//             return id;
-//         }
-//         return matches[1];
-//     }).includes(e.id));
-// };
-//
-// const getOutgoers = (node, nodes, edges) => {
-//     if (!isNode(node)) {
-//         return [];
-//     }
-//
-//     const outgoerIds = edges
-//         .filter((e) => e.source === node.id)
-//         .map((e) => e.target);
-//
-//     return nodes.filter((n) => outgoerIds.map((id) => {
-//         const matches = /([\w-^]+)__([\w-]+)/.exec(id);
-//         if (matches === null) {
-//             return id;
-//         }
-//         return matches[1];
-//     }).includes(n.id));
-// };
 
 function setElements(node, nodes, edges, selection, setNodes, setEdges) {
     if (node && [...nodes, ...edges]) {
@@ -146,6 +64,41 @@ function setElements(node, nodes, edges, selection, setNodes, setEdges) {
 
 export const highlightPath = (node, nodes, edges, selection, setNodes, setEdges) => {
     setElements(node, nodes, edges, selection, setNodes, setEdges);
+}
+
+export const highlightEdge = (edge, setNodes, setEdges) => {
+    const targets = [edge.source, edge.target];
+    setNodes((prevElements) => {
+        return prevElements?.map((elem) => {
+
+            if (targets.includes(elem.id)) {
+                elem.style = {
+                    ...elem.style,
+                    opacity: 1,
+                    background: '#E2E8F0',
+                }
+            }
+            return elem
+        })
+    });
+    setEdges((prevElements) => {
+            return prevElements?.map((elem) => {
+
+                if (elem.id === edge.id) {
+                    elem.animated = true
+                    elem.style = {
+                        ...elem.style,
+                        stroke: '#0000FF',
+                        strokeWidth: 2,
+                        opacity: 1,
+                    }
+                }
+
+                return elem
+            })
+        }
+    )
+    ;
 }
 
 export const resetNodeStyles = (setNodes, setEdges) => {

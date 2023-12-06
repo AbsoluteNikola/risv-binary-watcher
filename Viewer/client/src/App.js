@@ -1,18 +1,13 @@
 import {initialNodes, initialEdges} from './elements.js';
 import ELK from 'elkjs';
-import React, {useCallback, useEffect, useLayoutEffect, useState} from 'react';
+import React, {useCallback, useLayoutEffect, useState} from 'react';
 import ReactFlow, {
     ReactFlowProvider,
     addEdge,
-    Panel,
     useNodesState,
     useEdgesState,
     useReactFlow,
     MarkerType,
-    getOutgoers,
-    getIncomers,
-    isEdge,
-    isNode,
     useStoreApi,
     Controls,
     ControlButton
@@ -23,18 +18,16 @@ import {
     Grid,
     GridItem,
     ChakraProvider,
-    Tag,
-    IconButton
+    Tag
 } from "@chakra-ui/react";
 
 import {
     UnlockIcon,
-    LockIcon,
-    ArrowRightIcon
+    LockIcon
 } from "@chakra-ui/icons";
 import './App.css';
 import 'reactflow/dist/style.css';
-import {highlightPath, resetNodeStyles} from "./highlight";
+import {highlightPath, resetNodeStyles, highlightEdge} from "./highlight";
 import {SliderMarkExample} from "./slider";
 
 const elk = new ELK();
@@ -320,10 +313,14 @@ function App() {
                             const node = selectedElements.nodes[0]
                             if (node == null) {
                                 resetNodeStyles(setNodes, setEdges)
-                                setSelectedNode(undefined)
                             } else {
-                                setSelectedNode(node)
                                 highlightPath(node, nodes, edges, true, setNodes, setEdges)
+                            }
+                            const edge = selectedElements.edges[0]
+                            if (edge == null && node == null) {
+                                resetNodeStyles(setNodes, setEdges)
+                            } else if (edge != null) {
+                                highlightEdge(edge, setNodes, setEdges)
                             }
                         }
                     }}
