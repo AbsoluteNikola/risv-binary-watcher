@@ -11,17 +11,24 @@ import {
     Grid,
     GridItem
 } from "@chakra-ui/react";
-
+import useTimeout from './useTimeout';
 import React from "react";
 
 
-export function SliderMarkExample(maxVal, valueLeft, setValueLeft, valueRight, setValueRight) {
+export function SliderMarkDef(maxVal, valueLeft, setValueLeft, valueRight, setValueRight, filterTask) {
 
-    const handleChangeLeft = (value) => setValueLeft(value);
-    const handleChangeRight = (value) => setValueRight(value);
+    const handleChangeLeft = (value) => {
+        setValueLeft(value);
+        filterTask();
+    };
+    const handleChangeRight = (value) => {
+        setValueRight(value);
+        filterTask();
+    };
     const handleChangeBoth = (value) => {
         setValueLeft(value[0]);
         setValueRight(value[1]);
+        filterTask();
     }
 
     return (

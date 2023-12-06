@@ -1,6 +1,6 @@
 import {initialNodes, initialEdges} from './elements.js';
 import ELK from 'elkjs';
-import React, {useCallback, useLayoutEffect, useState} from 'react';
+import React, {useCallback, useLayoutEffect, useState, useEffect} from 'react';
 import ReactFlow, {
     ReactFlowProvider,
     addEdge,
@@ -28,7 +28,8 @@ import {
 import './App.css';
 import 'reactflow/dist/style.css';
 import {highlightPath, resetNodeStyles, highlightEdge} from "./highlight";
-import {SliderMarkExample} from "./slider";
+import {SliderMarkDef} from "./slider";
+import useTimeout from "./useTimeout";
 
 const elk = new ELK();
 
@@ -158,22 +159,28 @@ function App() {
     let _maxValSize = 1;
     let _maxValReq = 1;
 
-    function newGraphFromJS(raw_node) {
+    function newGraphFromJSNodes(raw_node) {
         setNodes((nds) => nds.concat({
             id: raw_node.Id.toString(),
             position: def_position,
             data: {label: raw_node.Name + '\nversion ' + raw_node.Version},
             size: parseInt(raw_node.Size)
         }));
+
+    }
+
+    function newGraphFromJSEdges(raw_node) {
+        const setReq = new Set(raw_node.Requirements);
+
         const intSize = parseInt(raw_node.Size);
-        const reqSize = raw_node.Requirements.length
+        const reqSize = setReq.size;
         if (intSize > _maxValSize) {
             _maxValSize = intSize;
         }
         if (reqSize > _maxValReq) {
             _maxValReq = reqSize;
         }
-        raw_node.Requirements.forEach((e) =>
+        setReq.forEach((e) =>
             setEdges((edgs) => edgs.concat({
                 id: 'e' + raw_node.Id.toString() + e.toString(),
                 source: raw_node.Id.toString(),
@@ -201,7 +208,10 @@ function App() {
             setEdges([]);
             setNodes([]);
 
-            jsonData.forEach(newGraphFromJS)
+            jsonData.forEach(newGraphFromJSNodes)
+            await sleep(20);
+
+            jsonData.forEach(newGraphFromJSEdges)
             setMaxValReq(_maxValReq);
             setMaxValSize(_maxValSize);
             setValueRightReq(_maxValReq);
@@ -244,6 +254,13 @@ function App() {
     };
 
 
+
+    const [filterTask] = useTimeout(() => {
+        console.log("aaa");
+    }, 1500);
+
+
+
     return (
         <Grid w="100vw" h="100vh" templateColumns="repeat(6, 1fr)" gap={0}>
             <GridItem borderRight="1px solid" borderColor="gray.200" hidden={hidePanel}>
@@ -271,9 +288,9 @@ function App() {
                     <GridItem p={4} borderTop="1px solid" borderBottom="1px solid" borderColor="gray.200">
                         <Heading as='h4' size='md' mt={4}>Filters:</Heading>
                         <Heading as='h5' size='sm' mt={4}>by size:</Heading>
-                        {SliderMarkExample(maxValSize, valueLeftSize, setValueLeftSize, valueRightSize, setValueRightSize)}
+                        {SliderMarkDef(maxValSize, valueLeftSize, setValueLeftSize, valueRightSize, setValueRightSize, filterTask)}
                         <Heading as='h5' size='sm' mt={6}>by requirements count:</Heading>
-                        {SliderMarkExample(maxValReq, valueLeftReq, setValueLeftReq, valueRightReq, setValueRightReq)}
+                        {SliderMarkDef(maxValReq, valueLeftReq, setValueLeftReq, valueRightReq, setValueRightReq, filterTask)}
 
                         <Button id="apply" w='100%' mt={4} mb={4} onClick={() => {
                             setValueLeftReq('0');
