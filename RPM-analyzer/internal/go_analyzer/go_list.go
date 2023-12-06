@@ -7,10 +7,6 @@ import (
 )
 
 func getNodeFromPackage(projectPath string, packageName string, counter *int) (*Node, *[]string) {
-	if packageName == "" {
-		packageName = GetModuleName(projectPath)
-	}
-
 	goListResponse := RunGoList(projectPath, packageName)
 
 	if goListResponse == "" {
@@ -18,6 +14,10 @@ func getNodeFromPackage(projectPath string, packageName string, counter *int) (*
 	}
 
 	imports := strings.Split(goListResponse, " ")
+
+	if packageName == "" {
+		packageName = GetModuleName(projectPath)
+	}
 
 	return createNode(counter, packageName), &imports
 }

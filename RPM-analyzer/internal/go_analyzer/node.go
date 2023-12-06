@@ -17,7 +17,7 @@ func BuildGraph(projectPath string) *Node {
 
 	moduleName := GetModuleName(projectPath)
 
-	return buildGraphRec(moduleName, moduleName, projectPath, &seen, &counter)
+	return buildGraphRec("", moduleName, projectPath, &seen, &counter)
 }
 
 func Print(head *Node) {
@@ -41,7 +41,7 @@ func buildGraphRec(packageName string, moduleName string, projectPath string, se
 		return processedNode
 	}
 
-	if !strings.HasPrefix(packageName, moduleName) {
+	if packageName != "" && !strings.HasPrefix(packageName, moduleName) {
 		leaf := getLeafNode(counter, packageName)
 		(*seen)[packageName] = leaf
 
