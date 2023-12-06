@@ -35,13 +35,13 @@ const elk = new ELK();
 
 
 const elkOptions = {
-    'elk.algorithm': 'force',
-    'elk.layered.spacing.nodeNodeBetweenLayers': '100',
-    'elk.spacing.nodeNode': '100',
+    'elk.algorithm': 'force',  //sporeOverlap
+    'elk.layered.spacing.nodeNodeBetweenLayers': '200',
+    'elk.spacing.nodeNode': '200',
     'org.eclipse.elk.force.model': 'EADES',
     'org.eclipse.elk.topdown.nodeType': 'PARALLEL_NODE',
     'org.eclipse.elk.aspectRatio': '1.7',
-    'org.eclipse.elk.force.repulsion': '2.0'
+    'org.eclipse.elk.force.repulsion': '2'
 };
 
 const getLayoutedElements = (nodes, edges, options = {}) => {
