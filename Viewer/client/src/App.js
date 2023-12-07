@@ -314,6 +314,7 @@ function App() {
                             setValueLeftSize('0');
                             setValueRightReq(maxValReq);
                             setValueRightSize(maxValSize);
+                            filterTask();
                         }}>Reset filters</Button>
 
                     </GridItem>
