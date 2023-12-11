@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	goAnalyzerCli()
+	rpmAnalyzerCli()
 }
 
 func rpmAnalyzerCli() {
