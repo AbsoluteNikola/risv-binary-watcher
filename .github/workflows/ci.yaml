@@ -41,11 +41,11 @@ jobs:
       - name: Get the Path Version
         id: get_path
         uses: reecetech/version-increment@2023.9.3
-        if: github.ref == 'refs/heads/vldf/ci-cd'
+        if: github.ref == 'refs/heads/release'
 
       - name: Get the Version
         id: get_version
-        if: github.ref == 'refs/heads/vldf/ci-cd'
+        if: github.ref == 'refs/heads/release'
         run: |
           export VER="v$(cat VERSION).$(echo ${{ steps.get_path.outputs.patch-version }}-viewer)"
           echo "VERSION=$VER" >> $GITHUB_ENV
@@ -84,11 +84,11 @@ jobs:
       - name: Get the Path Version
         id: get_path
         uses: reecetech/version-increment@2023.9.3
-        if: github.ref == 'refs/heads/vldf/ci-cd'
+        if: github.ref == 'refs/heads/release'
 
       - name: Get the Version
         id: get_version
-        if: github.ref == 'refs/heads/vldf/ci-cd'
+        if: github.ref == 'refs/heads/release'
         run: |
           export VER="v$(cat VERSION).$(echo ${{ steps.get_path.outputs.patch-version }}-analyzer)"
           echo "VERSION=$VER" >> $GITHUB_ENV
