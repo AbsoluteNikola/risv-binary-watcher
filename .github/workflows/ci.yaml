@@ -1,11 +1,12 @@
 name: RiscV watcher CI
-run-name: ${{ github.actor }} is testing out GitHub Actions
+run-name: ${{ github.actor }} is running their pipeline
 on: [push]
 permissions:
   contents: write
+  packages: write
 
 jobs:
-  frontend_ci:
+  viewer_ci:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -13,12 +14,39 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20.x'
+
       - run: npm ci
-        working-directory: ./frontend
-      - run: npm run build --if-present
-        working-directory: ./frontend
+        working-directory: ./Viewer
+      - run: npm run build
+        working-directory: ./Viewer
       - run: npm test
-        working-directory: ./frontend
+        working-directory: ./Viewer
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ghcr.io/${{ env.IMAGE_NAME }}
+      - name: Get the Version
+        id: get_version
+        if: github.ref == 'refs/heads/vldf/ci-cd'
+        run: |
+          export VER="v$(cat VERSION).$(echo ${{ steps.get_path.outputs.patch-version }}-viewer)"
+          echo "VERSION=$VER" >> $GITHUB_ENV
+          echo "version is $VER"
+      - name: Build and push Docker image
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: .
+          file: ./Viewer/Dockerfile
+          push: true
+          tags: ${{ env.VERSION }}
+          labels: ${{ steps.meta.outputs.labels }}
 
   rpm_analyzer_ci:
     runs-on: ubuntu-latest
