@@ -32,7 +32,7 @@ jobs:
         run: go get .
         working-directory: ./RPM-analyzer/
       - name: Build
-        run: go build -v ./...
+        run: go build -v ./
         working-directory: ./RPM-analyzer/
       - name: Test with the Go CLI
         working-directory: ./RPM-analyzer/
@@ -40,19 +40,22 @@ jobs:
       - name: Get the Path Version
         id: get_path
         uses: reecetech/version-increment@2023.9.3
+        if: github.ref == 'refs/heads/vldf/ci-cd'
       - name: Get the Version
         id: get_version
+        if: github.ref == 'refs/heads/vldf/ci-cd'
         run: |
-          VER=
+          export VER="v$(cat VERSION).$(echo ${{ steps.get_path.outputs.patch-version }}-analyzer)"
           echo "VERSION=$VER" >> $GITHUB_ENV
+          echo "version is $VER"
       - name: Create the Release
         id: upload-release-asset
         uses: softprops/action-gh-release@v1
-        if: github.ref == 'refs/heads/vldf/ci-cd'
+        if: github.ref == 'refs/heads/release'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: |
-            ./binary_watcher
+            ./RPM-analyzer/binary_watcher
           name: rpm-analyzer
           tag_name: ${{ env.VERSION }}
