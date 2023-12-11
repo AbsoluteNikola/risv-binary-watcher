@@ -5,6 +5,10 @@ permissions:
   contents: write
   packages: write
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
 jobs:
   viewer_ci:
     runs-on: ubuntu-latest
@@ -17,19 +21,28 @@ jobs:
 
       - run: npm ci
         working-directory: ./Viewer
+
       - run: npm run build-cicd
         working-directory: ./Viewer
+
       - name: Log in to the Container registry
         uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
         with:
-          registry: ghcr.io
+          registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Extract metadata for Docker
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: ghcr.io/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+      - name: Get the Path Version
+        id: get_path
+        uses: reecetech/version-increment@2023.9.3
+        if: github.ref == 'refs/heads/vldf/ci-cd'
+
       - name: Get the Version
         id: get_version
         if: github.ref == 'refs/heads/vldf/ci-cd'
@@ -37,36 +50,42 @@ jobs:
           export VER="v$(cat VERSION).$(echo ${{ steps.get_path.outputs.patch-version }}-viewer)"
           echo "VERSION=$VER" >> $GITHUB_ENV
           echo "version is $VER"
+
       - name: Build and push Docker image
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
-          context: .
-          file: ./Viewer/Dockerfile
+          context: ./Viewer
           push: true
-          tags: ${{ env.VERSION }}
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
   rpm_analyzer_ci:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup Go
         uses: actions/setup-go@v4
         with:
           go-version: '1.21.4'
+
       - name: Install dependencies
         run: go get .
         working-directory: ./RPM-analyzer/
+
       - name: Build
         run: go build -v ./
         working-directory: ./RPM-analyzer/
+
       - name: Test with the Go CLI
         working-directory: ./RPM-analyzer/
         run: go test
+
       - name: Get the Path Version
         id: get_path
         uses: reecetech/version-increment@2023.9.3
         if: github.ref == 'refs/heads/vldf/ci-cd'
+
       - name: Get the Version
         id: get_version
         if: github.ref == 'refs/heads/vldf/ci-cd'
@@ -74,6 +93,7 @@ jobs:
           export VER="v$(cat VERSION).$(echo ${{ steps.get_path.outputs.patch-version }}-analyzer)"
           echo "VERSION=$VER" >> $GITHUB_ENV
           echo "version is $VER"
+
       - name: Create the Release
         id: upload-release-asset
         uses: softprops/action-gh-release@v1
