@@ -27,10 +27,10 @@ jobs:
           go-version: '1.21.4'
       - name: Install dependencies
         run: go get .
-        working-directory: ./RPM-analyzer
+        working-directory: ./RPM-analyzer/
       - name: Build
         run: go build -v ./...
-        working-directory: ./RPM-analyzer
+        working-directory: ./RPM-analyzer/
       - name: Test with the Go CLI
-        working-directory: ./RPM-analyzer
+        working-directory: ./RPM-analyzer/
         run: go test

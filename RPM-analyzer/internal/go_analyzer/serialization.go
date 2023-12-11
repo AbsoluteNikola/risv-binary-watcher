@@ -1,4 +1,4 @@
-package main
+package go_analyzer
 
 import (
 	"encoding/json"
@@ -6,15 +6,12 @@ import (
 )
 
 type nodePresentation struct {
-	Id           int
-	Name         string
-	Version      string
-	Size         string
-	InstallDate  string
-	Requirements []int
+	Id          int
+	PackageName string
+	Imports     []int
 }
 
-func mapTreeToNodeModelArray(node *node, visited map[*node]bool) []nodePresentation {
+func mapTreeToNodeModelArray(node *Node, visited map[*Node]bool) []nodePresentation {
 	if visited[node] {
 		return []nodePresentation{}
 	}
@@ -24,15 +21,15 @@ func mapTreeToNodeModelArray(node *node, visited map[*node]bool) []nodePresentat
 	var result = make([]nodePresentation, 0)
 	result = append(result, mapNodeToNodeModel(node))
 
-	for _, requirement := range node.requirements {
+	for _, requirement := range node.imports {
 		result = append(result, mapTreeToNodeModelArray(requirement, visited)...)
 	}
 
 	return result
 }
 
-func mapNodeToNodeModel(node *node) nodePresentation {
-	var child = node.requirements
+func mapNodeToNodeModel(node *Node) nodePresentation {
+	var child = node.imports
 	var childIds = make([]int, 0)
 
 	for _, children := range child {
@@ -40,19 +37,16 @@ func mapNodeToNodeModel(node *node) nodePresentation {
 	}
 
 	var model = nodePresentation{
-		Id:           node.id,
-		Name:         node.name,
-		Version:      node.version,
-		Size:         node.size,
-		InstallDate:  node.installDate,
-		Requirements: childIds,
+		Id:          node.id,
+		PackageName: node.packageName,
+		Imports:     childIds,
 	}
 
 	return model
 }
 
-func serializeNodeToJson(root *node) string {
-	var nodeModel = mapTreeToNodeModelArray(root, make(map[*node]bool))
+func serializeNodeToJson(root *Node) string {
+	var nodeModel = mapTreeToNodeModelArray(root, make(map[*Node]bool))
 	var bytes, err = json.MarshalIndent(nodeModel, "", "  ")
 
 	if err != nil {

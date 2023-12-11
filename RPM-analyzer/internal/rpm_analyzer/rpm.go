@@ -1,11 +1,11 @@
-package main
+package rpm_analyzer
 
 import (
 	"os/exec"
 	"strings"
 )
 
-func getNodeFromRpm(packageName string, counter *int) (*node, *[]string) {
+func getNodeFromRpm(packageName string, counter *int) (*Node, *[]string) {
 	rpmResponse := runRpm(packageName)
 
 	if rpmResponse == "" {
