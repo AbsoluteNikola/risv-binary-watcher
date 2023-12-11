@@ -1,6 +1,9 @@
 name: RiscV watcher CI
 run-name: ${{ github.actor }} is testing out GitHub Actions
 on: [push]
+permissions:
+  contents: write
+
 jobs:
   frontend_ci:
     runs-on: ubuntu-latest
@@ -34,3 +37,22 @@ jobs:
       - name: Test with the Go CLI
         working-directory: ./RPM-analyzer/
         run: go test
+      - name: Get the Path Version
+        id: get_path
+        uses: reecetech/version-increment@2023.9.3
+      - name: Get the Version
+        id: get_version
+        run: |
+          VER=
+          echo "VERSION=$VER" >> $GITHUB_ENV
+      - name: Create the Release
+        id: upload-release-asset
+        uses: softprops/action-gh-release@v1
+        if: github.ref == 'refs/heads/vldf/ci-cd'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: |
+            ./binary_watcher
+          name: rpm-analyzer
+          tag_name: ${{ env.VERSION }}
