@@ -1,4 +1,4 @@
-package go_analyzer
+package go_package_analyzer
 
 import (
 	"os/exec"

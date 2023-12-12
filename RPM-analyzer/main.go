@@ -1,21 +1,51 @@
 package main
 
 import (
-	"binary_watcher/internal/go_analyzer"
+	"binary_watcher/internal/go_module_analyzer"
+	"binary_watcher/internal/go_package_analyzer"
 	"binary_watcher/internal/rpm_analyzer"
 	"fmt"
 	"os"
 )
 
 func main() {
-	goAnalyzerCli()
+	commonCli()
 }
 
-func rpmAnalyzerCli() {
-	args := os.Args[1:]
+const rpm = "rpm"
+const goImports = "imports"
+const goModules = "modules"
 
+func commonCli() {
+	if len(os.Args) == 0 {
+		fmt.Println("Specify run parameter. Use --help for more info")
+		return
+	}
+
+	if len(os.Args) == 0 {
+		fmt.Println("Specify run parameter. Use --help for more info")
+		return
+	}
+
+	args := os.Args[1]
+	otherArgs := os.Args[2:]
+	switch args {
+	case "help":
+		help()
+	case rpm:
+		rpmAnalyzerCli(otherArgs)
+	case goImports:
+		goImportAnalyzerCli(otherArgs)
+	case goModules:
+		goModulesAnalyzerCli(otherArgs)
+	default:
+		fmt.Println("Incorrect run parameter")
+	}
+}
+
+func rpmAnalyzerCli(args []string) {
 	if len(args) != 2 {
-		fmt.Println("expected path to RPM file and path to directory where output file will be saved")
+		fmt.Println("Expected path to RPM file and path to directory where output file will be saved")
 		return
 	}
 
@@ -36,11 +66,9 @@ func rpmAnalyzerCli() {
 	}
 }
 
-func goAnalyzerCli() {
-	args := os.Args[1:]
-
+func goImportAnalyzerCli(args []string) {
 	if len(args) != 1 {
-		fmt.Println("expected path to project's directory")
+		fmt.Println("Expected path to project's directory")
 		return
 	}
 
@@ -52,9 +80,39 @@ func goAnalyzerCli() {
 		return
 	}
 
-	node := go_analyzer.BuildGraph(projectPath)
+	node := go_package_analyzer.BuildGraph(projectPath)
 
 	if node != nil {
-		go_analyzer.Print(node)
+		go_package_analyzer.Print(node)
 	}
+}
+
+func goModulesAnalyzerCli(args []string) {
+	if len(args) != 1 {
+		fmt.Println("Expected root directory of go projects")
+		return
+	}
+
+	rootPath := args[0]
+
+	projectPathInfo, err := os.Stat(rootPath)
+	if os.IsNotExist(err) || !projectPathInfo.IsDir() {
+		fmt.Println("incorrect path to root directory of go projects")
+		return
+	}
+
+	modules := go_module_analyzer.GetModules(rootPath)
+
+	if modules == nil {
+		return
+	}
+
+	go_module_analyzer.Print(modules)
+}
+
+func help() {
+	fmt.Println("Select required mod:\n" +
+		fmt.Sprintf("1. Analyze RPM packages dependencies (%s)\n", rpm) +
+		fmt.Sprintf("2. Analyze go module package imports (%s)\n", goImports) +
+		fmt.Sprintf("3. Analyze go module info (%s)\n", goModules))
 }
