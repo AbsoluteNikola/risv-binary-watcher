@@ -30,9 +30,13 @@ import 'reactflow/dist/style.css';
 import {highlightPath, resetNodeStyles, highlightEdge} from "./highlight";
 import {SliderMarkDef} from "./slider";
 import useTimeout from "./useTimeout";
+import CustomNode from "./CustomNode";
 
 const elk = new ELK();
 
+const nodeTypes = {
+    selectorNode: CustomNode,
+};
 
 const elkOptions = {
     'elk.algorithm': 'force',  //sporeOverlap
@@ -57,8 +61,8 @@ const getLayoutedElements = (nodes, edges, options = {}) => {
             sourcePosition: isHorizontal ? 'right' : 'bottom',
 
             // Hardcode a width and height for elk to use when layouting.
-            width: 150,
-            height: 50,
+            width: 200,
+            height: 70,
         })),
         edges: edges,
     };
@@ -80,6 +84,7 @@ function App() {
     let [file_sel, setFileSel] = React.useState('No file selected');
     let [maxValSize, setMaxValSize] = React.useState('1');
     let [maxValReq, setMaxValReq] = React.useState('1');
+    let [maxValUse, setMaxValUse] = React.useState('1');
 
     let [lastSelLayout, setLastSelLayout] = React.useState('DOWN');
     let [blockSelection, setBlockSelection] = React.useState(false);
@@ -98,13 +103,13 @@ function App() {
     let [valueRightSize, setValueRightSize] = React.useState(maxValSize)
     let [valueLeftReq, setValueLeftReq] = React.useState('0')
     let [valueRightReq, setValueRightReq] = React.useState(maxValReq)
-
+    let [valueLeftUse, setValueLeftUse] = React.useState('0')
+    let [valueRightUse, setValueRightUse] = React.useState(maxValUse)
 
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const {fitView} = useReactFlow();
 
-    const [selectedNode, setSelectedNode] = useState(null);
 
     const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), []);
     const onLayout = useCallback(
@@ -128,29 +133,7 @@ function App() {
         onLayout({direction: 'DOWN', useInitialNodes: true});
     }, []);
 
-    // const [state, setState] = useState(null);
 
-    // const callBackendAPI = async () => {
-    //     const response = await fetch('/');
-    //     const body = await response.json();
-    //
-    //     if (response.status !== 200) {
-    //         throw Error(body.message)
-    //     }
-    //     return body;
-    // };
-    //
-    // useEffect(() => {
-    //     callBackendAPI()
-    //         .then(res => setState(res.express))
-    //         .catch(err => console.log(err));
-    // }, [])
-
-
-    // const onConnect = useCallback(
-    //     (params) => setEdges((eds) => addEdge(params, eds)),
-    //     [setEdges],
-    // );
     function sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
@@ -158,17 +141,35 @@ function App() {
     const def_position = {x: 0, y: 0};
     let _maxValSize = 1;
     let _maxValReq = 1;
+    let _maxValUse = 1;
+    let mapUse = new Map();
+
+    function collectUsageData(raw_node) {
+        const setReq = new Set(raw_node.Requirements);
+        setReq.forEach((e) => {
+            if (mapUse.has(e.toString())) {
+                mapUse.set(e.toString(), mapUse.get(e.toString()) + 1);
+            } else {
+                mapUse.set(e.toString(), 1);
+            }
+        })
+    }
 
     function newGraphFromJSNodes(raw_node) {
         const reqSize = (new Set(raw_node.Requirements)).size;
+        let usage = 0;
+        if (mapUse.has(raw_node.Id.toString())) {
+            usage = mapUse.get(raw_node.Id.toString());
+        }
         setNodes((nds) => nds.concat({
             id: raw_node.Id.toString(),
             position: def_position,
-            data: {label: raw_node.Name + '\nversion ' + raw_node.Version},
+            type: 'selectorNode',
+            data: {usage: usage, name: raw_node.Name, version: raw_node.Version, requirments: reqSize},
             size: parseInt(raw_node.Size),
-            reqs: reqSize
+            reqs: reqSize,
+            usage: usage
         }));
-
     }
 
     function newGraphFromJSEdges(raw_node) {
@@ -182,7 +183,7 @@ function App() {
         if (reqSize > _maxValReq) {
             _maxValReq = reqSize;
         }
-        setReq.forEach((e) =>
+        setReq.forEach((e) => {
             setEdges((edgs) => edgs.concat({
                 id: 'e' + raw_node.Id.toString() + e.toString(),
                 source: raw_node.Id.toString(),
@@ -194,13 +195,15 @@ function App() {
                     height: 20,
                     color: '#000000',
                 }
-            })))
+            }))
+        })
     }
 
     const onChangeFile = async (e) => {
         const files = (e.target).files;
         _maxValReq = 1;
         _maxValSize = 1;
+        mapUse = new Map();
 
         if (files != null) {
             let file = files[0];
@@ -210,20 +213,25 @@ function App() {
             setEdges([]);
             setNodes([]);
 
+            jsonData.forEach(collectUsageData)
             jsonData.forEach(newGraphFromJSNodes)
             await sleep(20);
-
             jsonData.forEach(newGraphFromJSEdges)
+
+            _maxValUse = Math.max(...mapUse.values());
+            console.log(_maxValUse);
+            setMaxValUse(_maxValUse);
             setMaxValReq(_maxValReq);
             setMaxValSize(_maxValSize);
+            setValueRightUse(_maxValUse);
             setValueRightReq(_maxValReq);
             setValueRightSize(_maxValSize);
 
             const forceLayout = document.getElementById(lastSelLayout);
             await sleep(15);
             forceLayout.click();
-            await sleep(15);
-            setTimeout(fitView, 15);
+            await sleep(20);
+            setTimeout(fitView, 50);
         }
     };
 
@@ -260,7 +268,8 @@ function App() {
         const hiddenIds = [];
         setNodes((aNodes) => {
                 return aNodes?.map((elem) => {
-                    elem.hidden = elem.size < valueLeftSize || elem.size > valueRightSize || elem.reqs < valueLeftReq || elem.reqs > valueRightReq;
+                    elem.hidden = elem.size < valueLeftSize || elem.size > valueRightSize || elem.reqs < valueLeftReq
+                        || elem.reqs > valueRightReq || elem.usage < valueLeftUse || elem.usage > valueRightUse;
                     if (elem.hidden === true) {
                         hiddenIds.push(elem.id);
                     }
@@ -298,35 +307,37 @@ function App() {
                             <GridItem w='100%'>
                                 <Button id="RIGHT" w='100%' style={{float: 'right'}}
                                         onClick={() => onLayout({direction: 'RIGHT'})}
-                                        mt={4} mb={4}>Horizontal</Button>
+                                        mt={4} mb={2}>Horizontal</Button>
                             </GridItem>
                         </Grid>
                     </GridItem>
                     <GridItem p={4} borderTop="1px solid" borderBottom="1px solid" borderColor="gray.200">
-                        <Heading as='h4' size='md' mt={4}>Filters:</Heading>
-                        <Heading as='h5' size='sm' mt={4}>by size:</Heading>
+                        <Heading as='h4' size='md' mt={2}>Filters:</Heading>
+                        <Heading as='h5' size='sm' mt={4}>Size:</Heading>
                         {SliderMarkDef(maxValSize, valueLeftSize, setValueLeftSize, valueRightSize, setValueRightSize, filterTask)}
-                        <Heading as='h5' size='sm' mt={6}>by requirements count:</Heading>
+                        <Heading as='h5' size='sm' mt={6}>Depends on:</Heading>
                         {SliderMarkDef(maxValReq, valueLeftReq, setValueLeftReq, valueRightReq, setValueRightReq, filterTask)}
-
-                        <Button id="apply" w='100%' mt={4} mb={4} onClick={() => {
+                        <Heading as='h5' size='sm' mt={6}>Used by:</Heading>
+                        {SliderMarkDef(maxValUse, valueLeftUse, setValueLeftUse, valueRightUse, setValueRightUse, filterTask)}
+                        <Button id="apply" w='100%' mt={4} mb={2} onClick={() => {
                             setValueLeftReq('0');
                             setValueLeftSize('0');
                             setValueRightReq(maxValReq);
                             setValueRightSize(maxValSize);
+                            setValueRightUse(maxValUse);
                             filterTask();
                         }}>Reset filters</Button>
 
                     </GridItem>
                     <GridItem p={4} borderBottom="1px solid" borderColor="gray.200">
-                        <Button id='locker' mt={4} isActive={blockSelection} variant='solid' width='100%'
+                        <Button id='locker' mt={2} isActive={blockSelection} variant='solid' width='100%'
                                 onClick={locker} rightIcon={blockSelectionImage}>{blockSelectionName}</Button>
-                        <Button id='fitview_button' mt={4} mb={4} variant='solid' width='100%' onClick={fitView}>Reset
+                        <Button id='fitview_button' mt={4} mb={2} variant='solid' width='100%' onClick={fitView}>Reset
                             view</Button>
                     </GridItem>
 
                     <GridItem p={4} alignSelf="end">
-                        <Button id='hide_panel' mt={4}
+                        <Button id='hide_panel' mt={2}
                                 variant='solid' width='100%'
                                 onClick={hide_panel}>Hide panel</Button>
                     </GridItem>
@@ -341,6 +352,7 @@ function App() {
                     //onConnect={onConnect}
                     onNodesChange={onNodesChange}
                     onEdgesChange={onEdgesChange}
+                    nodeTypes={nodeTypes}
                     fitView
                     elementsSelectable={true}
                     onSelectionChange={(selectedElements) => {
