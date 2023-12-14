@@ -30,9 +30,13 @@ import 'reactflow/dist/style.css';
 import {highlightPath, resetNodeStyles, highlightEdge} from "./highlight";
 import {SliderMarkDef} from "./slider";
 import useTimeout from "./useTimeout";
+import CustomNode from "./CustomNode";
 
 const elk = new ELK();
 
+const nodeTypes = {
+    selectorNode: CustomNode,
+};
 
 const elkOptions = {
     'elk.algorithm': 'force',  //sporeOverlap
@@ -57,8 +61,8 @@ const getLayoutedElements = (nodes, edges, options = {}) => {
             sourcePosition: isHorizontal ? 'right' : 'bottom',
 
             // Hardcode a width and height for elk to use when layouting.
-            width: 150,
-            height: 50,
+            width: 200,
+            height: 70,
         })),
         edges: edges,
     };
@@ -160,7 +164,8 @@ function App() {
         setNodes((nds) => nds.concat({
             id: raw_node.Id.toString(),
             position: def_position,
-            data: {label: raw_node.Name + '\nversion ' + raw_node.Version},
+            type: 'selectorNode',
+            data: {usage: usage, name: raw_node.Name, version: raw_node.Version, requirments: reqSize},
             size: parseInt(raw_node.Size),
             reqs: reqSize,
             usage: usage
@@ -225,8 +230,8 @@ function App() {
             const forceLayout = document.getElementById(lastSelLayout);
             await sleep(15);
             forceLayout.click();
-            await sleep(15);
-            setTimeout(fitView, 15);
+            await sleep(20);
+            setTimeout(fitView, 50);
         }
     };
 
@@ -346,6 +351,7 @@ function App() {
                     //onConnect={onConnect}
                     onNodesChange={onNodesChange}
                     onEdgesChange={onEdgesChange}
+                    nodeTypes={nodeTypes}
                     fitView
                     elementsSelectable={true}
                     onSelectionChange={(selectedElements) => {
