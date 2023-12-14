@@ -324,6 +324,7 @@ function App() {
                             setValueLeftSize('0');
                             setValueRightReq(maxValReq);
                             setValueRightSize(maxValSize);
+                            setValueRightUse(maxValUse);
                             filterTask();
                         }}>Reset filters</Button>
 
