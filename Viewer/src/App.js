@@ -151,7 +151,6 @@ function App() {
         setReq.forEach((e) => {
             if (mapUse.has(e)) {
                 mapUseList.get(e).push(raw_node.Name);
-                //mapUseList.set(e.toString(), tempLst);
                 mapUse.set(e, mapUse.get(e) + 1);
             } else {
                 mapUse.set(e, 1);
@@ -161,17 +160,6 @@ function App() {
         mapNamesList.set(raw_node.Id, raw_node.Name)
     }
 
-    function newLineList(lst) {
-        lst.map((subStr) => {
-            return (
-                <>
-                    {subStr}
-                    <br />
-                </>
-            );
-        })
-        return lst
-    }
 
     function newGraphFromJSNodes(raw_node) {
         const reqSize = (new Set(raw_node.Requirements)).size;
@@ -192,8 +180,8 @@ function App() {
                     requirments: reqSize,
                     size: _size,
                     install_date: raw_node.InstallDate,
-                    in_use_list: newLineList(mapUseList.get(raw_node.Id)),
-                    req_list: newLineList(_req_list),
+                    in_use_list: mapUseList.get(raw_node.Id).join("\n"),
+                    req_list: _req_list.join("\n")
                     },
             size: _size,
             reqs: reqSize,

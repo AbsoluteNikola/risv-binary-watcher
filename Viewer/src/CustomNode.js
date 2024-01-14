@@ -32,7 +32,7 @@ export default memo(({data, isConnectable}) => {
                         <PopoverArrow />
                         <PopoverCloseButton />
                         <PopoverHeader>{data.name}</PopoverHeader>
-                        <PopoverBody>
+                        <PopoverBody style={{'white-space':'pre-line'}}>
                             Version: {data.version} <br/>
                             Size: {data.size} Mb <br/>
                             Install date: {data.install_date}<br/> <br/>
