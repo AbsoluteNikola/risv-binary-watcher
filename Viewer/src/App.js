@@ -143,30 +143,59 @@ function App() {
     let _maxValReq = 1;
     let _maxValUse = 1;
     let mapUse = new Map();
+    let mapUseList = new Map();
+    let mapNamesList = new Map();
 
     function collectUsageData(raw_node) {
         const setReq = new Set(raw_node.Requirements);
         setReq.forEach((e) => {
-            if (mapUse.has(e.toString())) {
-                mapUse.set(e.toString(), mapUse.get(e.toString()) + 1);
+            if (mapUse.has(e)) {
+                mapUseList.get(e).push(raw_node.Name);
+                //mapUseList.set(e.toString(), tempLst);
+                mapUse.set(e, mapUse.get(e) + 1);
             } else {
-                mapUse.set(e.toString(), 1);
+                mapUse.set(e, 1);
+                mapUseList.set(e, [raw_node.Name])
             }
         })
+        mapNamesList.set(raw_node.Id, raw_node.Name)
+    }
+
+    function newLineList(lst) {
+        lst.map((subStr) => {
+            return (
+                <>
+                    {subStr}
+                    <br />
+                </>
+            );
+        })
+        return lst
     }
 
     function newGraphFromJSNodes(raw_node) {
         const reqSize = (new Set(raw_node.Requirements)).size;
         let usage = 0;
-        if (mapUse.has(raw_node.Id.toString())) {
-            usage = mapUse.get(raw_node.Id.toString());
+        if (mapUse.has(raw_node.Id)) {
+            usage = mapUse.get(raw_node.Id);
         }
+        let _size = Math.ceil(parseInt(raw_node.Size) / 1024);
+        let _req_list = [];
+        raw_node.Requirements.forEach( (e) => { _req_list.push(mapNamesList.get(e))})
         setNodes((nds) => nds.concat({
             id: raw_node.Id.toString(),
             position: def_position,
             type: 'selectorNode',
-            data: {usage: usage, name: raw_node.Name, version: raw_node.Version, requirments: reqSize},
-            size: parseInt(raw_node.Size),
+            data: { usage: usage,
+                    name: raw_node.Name,
+                    version: raw_node.Version,
+                    requirments: reqSize,
+                    size: _size,
+                    install_date: raw_node.InstallDate,
+                    in_use_list: newLineList(mapUseList.get(raw_node.Id)),
+                    req_list: newLineList(_req_list),
+                    },
+            size: _size,
             reqs: reqSize,
             usage: usage
         }));
@@ -175,7 +204,7 @@ function App() {
     function newGraphFromJSEdges(raw_node) {
         const setReq = new Set(raw_node.Requirements);
 
-        const intSize = parseInt(raw_node.Size);
+        const intSize = Math.ceil(parseInt(raw_node.Size) / 1024 );
         const reqSize = setReq.size;
         if (intSize > _maxValSize) {
             _maxValSize = intSize;
@@ -313,7 +342,7 @@ function App() {
                     </GridItem>
                     <GridItem p={4} borderTop="1px solid" borderBottom="1px solid" borderColor="gray.200">
                         <Heading as='h4' size='md' mt={2}>Filters:</Heading>
-                        <Heading as='h5' size='sm' mt={4}>Size:</Heading>
+                        <Heading as='h5' size='sm' mt={4}>Size (Mb):</Heading>
                         {SliderMarkDef(maxValSize, valueLeftSize, setValueLeftSize, valueRightSize, setValueRightSize, filterTask)}
                         <Heading as='h5' size='sm' mt={6}>Depends on:</Heading>
                         {SliderMarkDef(maxValReq, valueLeftReq, setValueLeftReq, valueRightReq, setValueRightReq, filterTask)}
