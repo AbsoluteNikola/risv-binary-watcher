@@ -8,7 +8,7 @@
 curl -L https://github.com/AbsoluteNikola/risv-binary-watcher/releases/download/{VERSION}/binary_watcher -o ./binary_watcher
 ```
 
-_Акуальная версия v0.0.2-analyzer, бинарник для GNU Linux x86-64_
+_Акуальная версия v0.0.3-analyzer, бинарник для GNU Linux x86-64_
 
 ### Использование
 ```shell
