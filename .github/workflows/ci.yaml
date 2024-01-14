@@ -93,7 +93,7 @@ jobs:
         id: get_version
         if: github.ref == 'refs/heads/release'
         run: |
-          export VER="v$(cat VERSION).$(echo ${{ steps.get_path.outputs.patch-version }}-analyzer)"
+          export VER="v$(cat VERSION)-analyzer"
           echo "VERSION=$VER" >> $GITHUB_ENV
           echo "version is $VER"
 
