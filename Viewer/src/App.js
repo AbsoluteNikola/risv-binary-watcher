@@ -161,12 +161,18 @@ function App() {
         if (mapUse.has(raw_node.Id.toString())) {
             usage = mapUse.get(raw_node.Id.toString());
         }
+        let _size = Math.ceil(parseInt(raw_node.Size) / 1024);
         setNodes((nds) => nds.concat({
             id: raw_node.Id.toString(),
             position: def_position,
             type: 'selectorNode',
-            data: {usage: usage, name: raw_node.Name, version: raw_node.Version, requirments: reqSize},
-            size: parseInt(raw_node.Size),
+            data: {usage: usage,
+                   name: raw_node.Name,
+                   version: raw_node.Version,
+                   requirments: reqSize,
+                   size: _size,
+                   install_date: raw_node.InstallDate},
+            size: _size,
             reqs: reqSize,
             usage: usage
         }));
@@ -175,7 +181,7 @@ function App() {
     function newGraphFromJSEdges(raw_node) {
         const setReq = new Set(raw_node.Requirements);
 
-        const intSize = parseInt(raw_node.Size);
+        const intSize = Math.ceil(parseInt(raw_node.Size) / 1024 );
         const reqSize = setReq.size;
         if (intSize > _maxValSize) {
             _maxValSize = intSize;
@@ -313,7 +319,7 @@ function App() {
                     </GridItem>
                     <GridItem p={4} borderTop="1px solid" borderBottom="1px solid" borderColor="gray.200">
                         <Heading as='h4' size='md' mt={2}>Filters:</Heading>
-                        <Heading as='h5' size='sm' mt={4}>Size:</Heading>
+                        <Heading as='h5' size='sm' mt={4}>Size (Mb):</Heading>
                         {SliderMarkDef(maxValSize, valueLeftSize, setValueLeftSize, valueRightSize, setValueRightSize, filterTask)}
                         <Heading as='h5' size='sm' mt={6}>Depends on:</Heading>
                         {SliderMarkDef(maxValReq, valueLeftReq, setValueLeftReq, valueRightReq, setValueRightReq, filterTask)}

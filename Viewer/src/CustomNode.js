@@ -1,5 +1,18 @@
 import React, {memo} from 'react';
 import { Handle, Position} from 'reactflow'
+import {
+    IconButton,
+    Popover,
+    PopoverTrigger,
+    PopoverContent,
+    PopoverHeader,
+    PopoverBody,
+    PopoverFooter,
+    PopoverArrow,
+    PopoverCloseButton,
+    PopoverAnchor,
+} from '@chakra-ui/react'
+import { InfoOutlineIcon } from "@chakra-ui/icons";
 export default memo(({data, isConnectable}) => {
     return (
         <>
@@ -10,7 +23,24 @@ export default memo(({data, isConnectable}) => {
             isConnectable={isConnectable}
             />
             <div style={{border: '1px solid #777', 'border-radius': '10px', padding: 10}}>
-                <span style={{color: '#008000'}}>In use: {data.usage}</span> <br/>
+                <span style={{color: '#008000'}}>In use: {data.usage}</span>
+                <Popover>
+                    <PopoverTrigger>
+                        <IconButton style={{float: 'right', 'margin-top': '5px'}}  isRound={true} size='s' variant='ghost' icon={<InfoOutlineIcon/>}/>
+                    </PopoverTrigger>
+                    <PopoverContent>
+                        <PopoverArrow />
+                        <PopoverCloseButton />
+                        <PopoverHeader>{data.name}</PopoverHeader>
+                        <PopoverBody>
+                            Name: {data.name} <br/>
+                            Version: {data.version} <br/>
+                            Size: {data.size} Mb <br/>
+                            Install date: {data.install_date}<br/>
+                        </PopoverBody>
+                    </PopoverContent>
+                </Popover>
+                 <br/>
                 Name: {data.name} <br/>
                 Version: {data.version} <br/>
                 <span style={{color: '#FF0000'}}>Requirements: {data.requirments}</span>
