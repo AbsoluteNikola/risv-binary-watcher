@@ -34,7 +34,7 @@ export default memo(({data, isConnectable}) => {
                         <PopoverHeader>{data.name}</PopoverHeader>
                         <PopoverBody style={{'white-space':'pre-line'}}>
                             Version: {data.version} <br/>
-                            Size: {data.size} Mb <br/>
+                            Size: {data.size} <br/>
                             Install date: {data.install_date}<br/> <br/>
                             In use: <br/> {data.in_use_list} <br/> <br/>
                             Requirements: <br/> {data.req_list}

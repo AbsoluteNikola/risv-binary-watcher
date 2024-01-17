@@ -167,7 +167,11 @@ function App() {
         if (mapUse.has(raw_node.Id)) {
             usage = mapUse.get(raw_node.Id);
         }
-        let _size = Math.ceil(parseInt(raw_node.Size) / 1024);
+        let _size = (parseInt(raw_node.Size) / 1024 / 1024).toFixed(2);
+        const intSize = Math.ceil(parseInt(raw_node.Size) / 1024 / 1024 );
+        if (intSize > _maxValSize) {
+            _maxValSize = intSize;
+        }
         let _req_list = [];
         raw_node.Requirements.forEach( (e) => { _req_list.push(mapNamesList.get(e))})
         setNodes((nds) => nds.concat({
@@ -178,7 +182,7 @@ function App() {
                     name: raw_node.Name,
                     version: raw_node.Version,
                     requirments: reqSize,
-                    size: _size,
+                    size: raw_node.Size + " Byte (" +"\u2248"+ _size +" Mb"+ ")",
                     install_date: raw_node.InstallDate,
                     in_use_list: mapUseList.get(raw_node.Id).join("\n"),
                     req_list: _req_list.join("\n")
@@ -191,12 +195,7 @@ function App() {
 
     function newGraphFromJSEdges(raw_node) {
         const setReq = new Set(raw_node.Requirements);
-
-        const intSize = Math.ceil(parseInt(raw_node.Size) / 1024 );
         const reqSize = setReq.size;
-        if (intSize > _maxValSize) {
-            _maxValSize = intSize;
-        }
         if (reqSize > _maxValReq) {
             _maxValReq = reqSize;
         }
